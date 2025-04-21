@@ -1,0 +1,61 @@
+<div *ngIf="!isSidebarVisible">
+<div class="chat-widget">
+    <button mat-fab class="chat-trigger" (click)="toggleChat()">
+      <mat-icon>{{ isOpen ? 'close' : 'chat' }}</mat-icon>
+      
+    </button>
+    <div class="notification-badge" *ngIf="!isOpen && hasNotification">1</div>
+
+    <div class="chat-window" *ngIf="isOpen">
+      <div class="chat-header">
+        <span>{{ showHistory ? 'Conversations' : 'User Name' }}</span>
+        <div class="chat-header-actions">
+          <mat-icon (click)="toggleHistory()">menu</mat-icon>
+          <mat-icon (click)="toggleChat()">close</mat-icon>
+        </div>
+      </div>
+
+      <div class="chat-content" [class.show-history]="showHistory">
+        <div class="chat-main">
+          <div class="chat-messages">
+            <div *ngFor="let message of currentConversation.messages" 
+                 class="message"
+                 [ngClass]="message.sender">
+              {{ message.text }}
+            </div>
+          </div>
+
+          <div class="chat-input">
+            <input matInput [(ngModel)]="newMessage" placeholder="demander quelque chose" (keyup.enter)="sendMessage()">
+            <button mat-icon-button (click)="sendMessage()">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="chat-history">
+          <div class="new-conversation">
+            <button mat-raised-button class="new-conversation-btn" (click)="createNewConversation()">
+              <mat-icon>add</mat-icon>
+              Nouvelle conversation
+            </button>
+          </div>
+          <div class="history-list">
+            <div *ngFor="let conversation of conversations" 
+                 class="history-item"
+                 [class.active]="conversation.id === currentConversation.id"
+                 (click)="selectConversation(conversation)">
+              <div>{{ conversation.title }}</div>
+              <div style="color: #666; font-size: 0.9em;">
+                {{ conversation.date | date:'short' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  

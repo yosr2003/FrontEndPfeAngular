@@ -1,0 +1,136 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f1f5ff;
+  font-family: 'Inter', sans-serif;
+}
+
+.chat-header {
+  background-color: #e7edff;
+  padding: 20px 24px;
+  border-bottom: 1px solid #d0d8f0;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2a2a2a;
+}
+
+.header-subtitle {
+  font-size: 14px;
+  color: #6a6a6a;
+  margin-top: 4px;
+}
+
+.chat-box {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: white;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin: 16px;
+}
+
+.chat-sidebar {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8f9ff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.chat-sidebar .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.contact-name {
+  font-weight: 600;
+  font-size: 18px;
+  color: #333;
+}
+
+.chat-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #fefeff;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+}
+
+.message.left {
+  align-items: flex-start;
+}
+
+.message.right {
+  align-items: flex-end;
+}
+
+.avatar-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-bottom: 6px;
+}
+
+.bubble {
+  background-color: #e7edff;
+  color: #2a2a2a;
+  padding: 14px 18px;
+  border-radius: 18px;
+  max-width: 320px;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.message.right .bubble {
+  background-color: #d9f0ff;
+}
+
+.date {
+  font-size: 12px;
+  color: #999;
+  margin-top: 6px;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  background-color: white;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 24px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.chat-input input:focus {
+  border-color: #3f51b5;
+}
+
+.send-icon {
+  margin-left: 12px;
+  cursor: pointer;
+  color: #3f51b5;
+  font-size: 24px;
+}
