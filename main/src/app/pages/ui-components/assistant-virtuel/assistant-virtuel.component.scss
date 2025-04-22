@@ -81,6 +81,7 @@ body {
     min-width: 100%;
     display: flex;
     flex-direction: column;
+    height: 100%; 
   }
   
   .chat-history {
@@ -152,6 +153,16 @@ body {
     padding: 15px;
     overflow-y: auto;
     background: #f5f5f5;
+    max-height: 250px;
+  }
+  .chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+  
   }
   
   .message {

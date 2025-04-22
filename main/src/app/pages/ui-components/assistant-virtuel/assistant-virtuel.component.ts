@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { AssistantStateService } from '../../extra/assistant-state.service';
 import { Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 interface Message {
   text: string;
@@ -63,7 +64,7 @@ export class AssistantVirtuelComponent {
   ];
 
 // dans assistant-virtuel.component.ts
-constructor(private assistantStateService: AssistantStateService) {
+constructor(private assistantStateService: AssistantStateService, private http: HttpClient) {
   this.currentConversation = this.conversations[0];
 }
 
@@ -121,23 +122,37 @@ ngOnInit() {
   }
 
   sendMessage() {
-    if (this.newMessage.trim()) {
-      this.currentConversation.messages.push({
-        text: this.newMessage,
-        sender: 'user',
-        timestamp: new Date()
+    if (!this.newMessage.trim()) return;
+  
+    // Ajoute le message de l'utilisateur
+    this.currentConversation.messages.push({
+      text: this.newMessage,
+      sender: 'user',
+      timestamp: new Date()
+    });
+  
+    const userMessageCopy = this.newMessage; // Pour garder le texte avant de le vider
+    this.newMessage = '';
+  
+    // Appel à ton backend
+    this.http.post<any>('https://4dc1-34-16-131-67.ngrok-free.app/chat', { message: userMessageCopy })
+      .subscribe({
+        next: (res) => {
+          // Si ton backend retourne juste un string :
+          this.currentConversation.messages.push({
+            text: res, // ou res.response si c’est sous forme { response: "..." }
+            sender: 'bot',
+            timestamp: new Date()
+          });
+        },
+        error: (err) => {
+          console.error(err);
+          this.currentConversation.messages.push({
+            text: "Erreur lors de la communication avec le serveur.",
+            sender: 'bot',
+            timestamp: new Date()
+          });
+        }
       });
-      
-      // Simulate bot response
-      setTimeout(() => {
-        this.currentConversation.messages.push({
-          text: 'Je vous remercie pour votre message. Comment puis-je vous aider davantage?',
-          sender: 'bot',
-          timestamp: new Date()
-        });
-      }, 1000);
-
-      this.newMessage = '';
-    }
   }
 }
