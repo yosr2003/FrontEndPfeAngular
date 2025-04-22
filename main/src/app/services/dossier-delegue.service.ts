@@ -18,7 +18,7 @@ export class DossierDelegueService {
 
     // Création des en-têtes d'authentification
     const headers = new HttpHeaders({
-      'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbGljZS5kdXBvbnRAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDUzMDk1MTksImV4cCI6MTc0NTM5NTkxOX0.zgxhjo_7iRLug4UrShaiqXoKylkyiw8Kt4X065_RQZNs0zYGDGDh01-uFHjuzfu_bZmuHanlCBve7ufZbdl2yA`
+      'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbGljZS5kdXBvbnRAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDUzMTAyNDYsImV4cCI6MTc0NTM5NjY0Nn0.t7upMAr71AD_7J6hNaRCaIc3Sd_koEcaAuQQ_exk1i3HjIDZXsHyTjtwzP8Bhv2xChqOxkGt_840fjP960P-4w`
     });
 
     return this.http.get<DossierDelegue[]>(`${this.baseUrl}/dossiersDelegues`, { headers })
