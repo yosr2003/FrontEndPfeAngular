@@ -4,7 +4,9 @@
   height: 100vh;
   background-color: #f1f5ff;
   font-family: 'Inter', sans-serif;
+  overflow: hidden; /* Pour éviter les débordements */
 }
+
 
 .chat-header {
   background-color: #e7edff;
@@ -32,7 +34,7 @@
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  margin: 16px;
+  margin: 20px;
 }
 
 .chat-sidebar {
@@ -58,13 +60,14 @@
 
 .chat-content {
   flex: 1;
-  padding: 24px;
+  padding: 12px 24px 4px 24px; /* ↓ Réduction du padding bas */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
   background-color: #fefeff;
+  gap: 8px;
 }
+
 
 .message {
   display: flex;
@@ -134,3 +137,4 @@
   color: #3f51b5;
   font-size: 24px;
 }
+

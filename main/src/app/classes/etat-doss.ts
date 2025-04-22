@@ -1,0 +1,8 @@
+export enum EtatDoss {
+    TRAITEMENT = 'TRAITEMENT',
+    ANNULE = 'ANNULE',
+    VALIDE = 'VALIDE',
+    OUVERT='OUVERT',
+    CLOTURE='CLOTURE',
+    REJETE='REJETE'
+}

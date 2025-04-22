@@ -34,7 +34,7 @@ export class AppAssistantVirtuelSideBar {
   constructor(private assistantStateService: AssistantStateService) {}
 
   ngOnInit() {
-    this.assistantStateService.openSidebar(); // 👈 désactive le petit assistant
+    this.assistantStateService.openSidebar(); 
   }
 
   ngOnDestroy() {

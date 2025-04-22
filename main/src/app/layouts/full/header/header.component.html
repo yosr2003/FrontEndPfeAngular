@@ -1,12 +1,12 @@
-<mat-toolbar class="topbar gap-10">
+<mat-toolbar class="topbar px-4 py-2 d-flex align-items-center justify-content-between">
 
   <!-- Mobile Menu -->
-  
-  <button mat-icon-button (click)="toggleMobileNav.emit()" class="d-flex d-lg-none justify-content-center">
+  <button mat-icon-button (click)="toggleMobileNav.emit()" class="d-flex d-lg-none justify-content-center mx-2" matTooltip="Menu">
     <i-tabler name="menu-2" class="icon-20 d-flex"></i-tabler>
   </button>
 
-  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Notifications">
+  <!-- Notification -->
+  <button mat-icon-button [matMenuTriggerFor]="menu" class="mx-2" matTooltip="Notifications">
     <i-tabler class="d-flex" name="bell" matBadge="1" matBadgeColor="primary"></i-tabler>
   </button>
   <mat-menu #menu="matMenu">
@@ -14,35 +14,52 @@
     <button mat-menu-item>Item 2</button>
   </mat-menu>
 
+  <!-- Navigation Icons -->
+  <div class="d-flex align-items-center gap-4 mx-4">
+    <button mat-icon-button [routerLink]="['/home']" matTooltip="Accueil">
+      <i-tabler name="home" class="icon-22"></i-tabler>
+    </button>
 
+    <button mat-icon-button [routerLink]="['/contact']" matTooltip="Contact">
+      <i-tabler name="user" class="icon-22"></i-tabler>
+    </button>
+
+    <button mat-icon-button [routerLink]="['/chatbot']" matTooltip="Chatbot">
+      <i-tabler name="message-dots" class="icon-22"></i-tabler>
+    </button>
+
+    <button mat-icon-button [routerLink]="['/settings']" matTooltip="Paramètres">
+      <i-tabler name="settings" class="icon-22"></i-tabler>
+    </button>
+  </div>
+
+  <!-- Push remaining content right -->
   <span class="flex-1-auto"></span>
 
-  <!-- --------------------------------------------------------------- -->
-  <!-- profile Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-  <a mat-flat-button href="https://adminmart.com/product/modernize-angular-admin-dashboard/?ref=56"
-    target="_blank" class="d-flex justify-content-center bg-success">
-    Check Pro Template
-  </a>
-  <button mat-mini-fab [matMenuTriggerFor]="profilemenu" aria-label="Notifications">
+  <!-- Profile -->
+  <button mat-mini-fab [matMenuTriggerFor]="profilemenu" class="mx-2" matTooltip="Mon Profil">
     <img src="/assets/images/profile/user-1.jpg" class="rounded-circle object-cover d-block" width="35" />
   </button>
+
   <mat-menu #profilemenu="matMenu" class="cardWithShadow topbar-dd">
     <button mat-menu-item>
-      <mat-icon class="d-flex align-items-center"><i-tabler name="user" class="icon-18 d-flex"></i-tabler></mat-icon>My
-      Profile
+      <mat-icon class="d-flex align-items-center">
+        <i-tabler name="user" class="icon-18 d-flex"></i-tabler>
+      </mat-icon>Mon Profil
     </button>
     <button mat-menu-item>
-      <mat-icon class="d-flex align-items-center"><i-tabler name="mail" class="icon-18 d-flex"></i-tabler></mat-icon>My
-      Account
+      <mat-icon class="d-flex align-items-center">
+        <i-tabler name="mail" class="icon-18 d-flex"></i-tabler>
+      </mat-icon>Mon Compte
     </button>
     <button mat-menu-item>
-      <mat-icon class="d-flex align-items-center"><i-tabler name="list-check"
-          class="icon-18 d-flex"></i-tabler></mat-icon>My Task
+      <mat-icon class="d-flex align-items-center">
+        <i-tabler name="list-check" class="icon-18 d-flex"></i-tabler>
+      </mat-icon>Mes Tâches
     </button>
 
     <div class="p-x-12 m-t-12">
-      <a [routerLink]="['/authentication/login']" mat-stroked-button class="w-100">Logout</a>
+      <a [routerLink]="['/authentication/login']" mat-stroked-button class="w-100">Déconnexion</a>
     </div>
   </mat-menu>
 </mat-toolbar>

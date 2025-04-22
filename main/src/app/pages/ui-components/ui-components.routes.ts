@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { AppDossiersDeleguesComponent, } from './dossiersDelegues/dossiersDelegues.component';
+import { AppTransactionComponent } from './transactions/transaction.component';
 
 export const UiComponentsRoutes: Routes = [
   {
@@ -12,7 +13,7 @@ export const UiComponentsRoutes: Routes = [
       },
       {
         path: 'transactions',
-        component: AppDossiersDeleguesComponent,
+        component: AppTransactionComponent,
       },
       
     ],
