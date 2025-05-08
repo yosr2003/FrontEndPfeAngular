@@ -24,30 +24,30 @@ import { TransfertService } from 'src/app/services/transfert.service';
   styleUrls: ['./transaction.component.scss'],
 })
 export class AppTransactionComponent {
-displayedColumns: string[] = [
-   'refTransfert',
-           'etat',
-           'natureOperation',
-           'montantTransfert',
-           'natureTransfert',
-           'montantFinal',
-           'frais',
-           'datecre',
-           'dateEnvoie',
-           'typeTransfert',
-           'typeFrais',
-           'compteSource',
-           'compteCible'
-  ];
-  Transferts!: Transfert[];
+// displayedColumns: string[] = [
+//    'refTransfert',
+//            'etat',
+//            'natureOperation',
+//            'montantTransfert',
+//            'natureTransfert',
+//            'montantFinal',
+//            'frais',
+//            'datecre',
+//            'dateEnvoie',
+//            'typeTransfert',
+//            'typeFrais',
+//            'compteSource',
+//            'compteCible'
+//   ];
+  // Transferts!: Transfert[];
   constructor(private TransfertService: TransfertService) {
 }
   ngOnInit() {
   
-    this.TransfertService.getAllTransferts().subscribe(data => {
-      console.log('transferts reçus depuis le backend:', data);
-      this.Transferts = data;
-    });
+    // this.TransfertService.getAllTransferts().subscribe(data => {
+    //   console.log('transferts reçus depuis le backend:', data);
+    //   this.Transferts = data;
+    // });
     
 
     

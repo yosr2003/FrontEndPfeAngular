@@ -135,15 +135,16 @@ ngOnInit() {
     this.newMessage = '';
   
     // Appel à ton backend
-    this.http.post<any>('https://4dc1-34-16-131-67.ngrok-free.app/chat', { message: userMessageCopy })
+    this.http.post<any>('http://localhost:5000/chat', { message: userMessageCopy })
       .subscribe({
         next: (res) => {
           // Si ton backend retourne juste un string :
           this.currentConversation.messages.push({
-            text: res, // ou res.response si c’est sous forme { response: "..." }
+            text: res.response, // ou res.response si c’est sous forme { response: "..." }
             sender: 'bot',
             timestamp: new Date()
           });
+          console.log(res)
         },
         error: (err) => {
           console.error(err);
