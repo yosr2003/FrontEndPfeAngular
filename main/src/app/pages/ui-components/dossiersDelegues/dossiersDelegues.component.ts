@@ -39,14 +39,14 @@ export class AppDossiersDeleguesComponent implements OnInit {
     'rapportMouvement',
     'actions'
   ];
-  DossiersDelegues!: DossierDelegue[];
+  DossiersDelegues: DossierDelegue[] = [];
   constructor(private DossierDelegueService: DossierDelegueService) {
 }
   ngOnInit() {
   
-    this.DossierDelegueService.getAllDossiers().subscribe(data => {
-      console.log('Dossiers reçus depuis le backend:', data);
-      this.DossiersDelegues = data;
+    this.DossierDelegueService.getAllDossiers().subscribe(response => {
+      console.log('Dossiers reçus depuis le backend:', response);
+      this.DossiersDelegues = response.body;
     });
     
 

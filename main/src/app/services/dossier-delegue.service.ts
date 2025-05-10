@@ -12,7 +12,7 @@ export class DossierDelegueService {
  private baseUrl = 'http://localhost:8084'; 
 
   constructor(private http: HttpClient) { }
-  getAllDossiers(): Observable<DossierDelegue[]> {
+  getAllDossiers(): Observable<{ body: DossierDelegue[] }> {
 
     const token = localStorage.getItem('token'); 
 
@@ -21,7 +21,8 @@ export class DossierDelegueService {
       'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhbGljZS5kdXBvbnRAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDUzMTAyNDYsImV4cCI6MTc0NTM5NjY0Nn0.t7upMAr71AD_7J6hNaRCaIc3Sd_koEcaAuQQ_exk1i3HjIDZXsHyTjtwzP8Bhv2xChqOxkGt_840fjP960P-4w`
     });
 
-    return this.http.get<DossierDelegue[]>(`${this.baseUrl}/dossiersDelegues`, { headers })
+    return this.http.get<{ body: DossierDelegue[] }>(`${this.baseUrl}/dossiersDelegues`)
+      //, { headers }
       .pipe(
         catchError(this.handleError)
       );

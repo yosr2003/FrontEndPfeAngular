@@ -11,10 +11,10 @@ export const UiComponentsRoutes: Routes = [
         path: 'dossiersDelegues',
         component: AppDossiersDeleguesComponent,
       },
-      // {
-      //   path: 'transactions',
-      //   component: AppTransactionComponent,
-      // },
+      {
+        path: 'transactions',
+        component: AppTransactionComponent,
+      },
       
     ],
   },
