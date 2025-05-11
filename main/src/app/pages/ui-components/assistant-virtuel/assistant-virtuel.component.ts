@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AssistantStateService } from '../../extra/assistant-state.service';
 import { Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { ChatService } from 'src/app/services/chat.service';
 
 interface Message {
   text: string;
@@ -28,6 +29,7 @@ interface Conversation {
   styleUrl: './assistant-virtuel.component.scss'
 })
 export class AssistantVirtuelComponent {
+  botTyping = false;
   isOpen = false;
   hasNotification = true;
   showBubble = false;
@@ -64,7 +66,7 @@ export class AssistantVirtuelComponent {
   ];
 
 // dans assistant-virtuel.component.ts
-constructor(private assistantStateService: AssistantStateService, private http: HttpClient) {
+constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService) {
   this.currentConversation = this.conversations[0];
 }
 
@@ -78,6 +80,12 @@ ngOnInit() {
     }
   });
 }
+  scrollToBottom() {
+  const chatMessages = document.querySelector('.chat-messages');
+  if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  }
 
 
   ngOnDestroy() {
@@ -121,39 +129,81 @@ ngOnInit() {
     this.showHistory = false;
   }
 
+  // sendMessage() {
+  //   if (!this.newMessage.trim()) return;
+  
+  //   // Ajoute le message de l'utilisateur
+  //   this.currentConversation.messages.push({
+  //     text: this.newMessage,
+  //     sender: 'user',
+  //     timestamp: new Date()
+  //   });
+  
+  //   const userMessageCopy = this.newMessage; // Pour garder le texte avant de le vider
+  //   this.newMessage = '';
+  
+  //   // Appel à ton backend
+  //   this.http.post<any>('http://localhost:5004/chat', { message: userMessageCopy })
+  //     .subscribe({
+  //       next: (res) => {
+  //         // Si ton backend retourne juste un string :
+  //         this.currentConversation.messages.push({
+  //           text: res.response, // ou res.response si c’est sous forme { response: "..." }
+  //           sender: 'bot',
+  //           timestamp: new Date()
+  //         });
+  //         console.log(res)
+  //       },
+  //       error: (err) => {
+  //         console.error(err);
+  //         this.currentConversation.messages.push({
+  //           text: "Erreur lors de la communication avec le serveur.",
+  //           sender: 'bot',
+  //           timestamp: new Date()
+  //         });
+  //       }
+  //     });
+  // }
+
   sendMessage() {
-    if (!this.newMessage.trim()) return;
-  
-    // Ajoute le message de l'utilisateur
-    this.currentConversation.messages.push({
-      text: this.newMessage,
-      sender: 'user',
-      timestamp: new Date()
-    });
-  
-    const userMessageCopy = this.newMessage; // Pour garder le texte avant de le vider
-    this.newMessage = '';
-  
-    // Appel à ton backend
-    this.http.post<any>('http://localhost:5000/chat', { message: userMessageCopy })
-      .subscribe({
-        next: (res) => {
-          // Si ton backend retourne juste un string :
-          this.currentConversation.messages.push({
-            text: res.response, // ou res.response si c’est sous forme { response: "..." }
-            sender: 'bot',
-            timestamp: new Date()
-          });
-          console.log(res)
-        },
-        error: (err) => {
-          console.error(err);
-          this.currentConversation.messages.push({
-            text: "Erreur lors de la communication avec le serveur.",
-            sender: 'bot',
-            timestamp: new Date()
-          });
-        }
+  if (!this.newMessage.trim()) return;
+
+  const message = this.newMessage;
+  this.currentConversation.messages.push({
+    text: message,
+    sender: 'user',
+    timestamp: new Date()
+  });
+
+  this.newMessage = '';
+  this.botTyping = true;
+
+  // this.chatService.sendMessage(message).subscribe((response) => {
+  //   this.currentConversation.messages.push({
+  //     text: response,
+  //     sender: 'bot',
+  //     timestamp: new Date()
+  //   });
+  // });
+  this.chatService.sendMessage(message).subscribe({
+    next: (response) => {
+      this.botTyping = false;
+      this.currentConversation.messages.push({
+        text: response,
+        sender: 'bot',
+        timestamp: new Date()
       });
-  }
+      this.scrollToBottom();
+    },
+    error: () => {
+      this.botTyping = false;
+      this.currentConversation.messages.push({
+        text: "Erreur lors de la communication avec le serveur.",
+        sender: 'bot',
+        timestamp: new Date()
+      });
+    }
+  });
+}
+
 }

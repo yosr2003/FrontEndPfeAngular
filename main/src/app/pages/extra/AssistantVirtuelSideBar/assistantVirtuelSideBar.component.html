@@ -1,42 +1,31 @@
 <div class="chat-container">
-
   <div class="chat-box">
     <div class="chat-sidebar">
       <img src="assets/robot.png" class="avatar" alt="Avatar" />
       <span class="contact-name">Assistant GTI</span>
     </div>
 
-    <div class="chat-content">
-      <div class="messages">
-        <div class="message left">
-          <img src="assets/robot.png" class="avatar-small" alt="Avatar" />
-          <div class="bubble">Bonjour</div>
-          <div class="date">Jan 5, 2025</div>
-        </div>
+    <div class="chat-content-wrapper">
+      <div class="messages-container">
+        <div class="messages">
+          <div *ngFor="let message of currentConversation.messages" class="message" [ngClass]="message.sender">
+            <div class="bubble">{{ message.text }}</div>
+          </div>
 
-        <div class="message left">
-          <img src="assets/robot.png" class="avatar-small" alt="Avatar" />
-          <div class="bubble">Comment puis-je vous aider aujourd'hui ?</div>
-          <div class="date">Jan 6, 2025</div>
-        </div>
-
-        <div class="message right">
-          <div class="bubble">je veux dupliquer le dossier DOSS003</div>
-          <div class="date">Jan 6, 2025</div>
-        </div>
-        
-        <div class="message left">
-          <img src="assets/robot.png" class="avatar-small" alt="Avatar" />
-          <div class="bubble"> Le dossier DOSS003 a été dupliqué avec succès. Voici l'identifiant du nouveau dossier : DOSS004.</div>
-          <div class="date">Jan 6, 2025</div>
+          <div class="message bot typing-indicator" *ngIf="botTyping">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
         </div>
       </div>
-
+      
       <div class="chat-input">
-        <input type="text" placeholder="Send message" />
-        <mat-icon class="send-icon">send</mat-icon>
+        <input matInput [(ngModel)]="newMessage" placeholder="demander quelque chose" (keyup.enter)="sendMessage()">
+        <button mat-icon-button (click)="sendMessage()">
+          <mat-icon>send</mat-icon>
+        </button>
       </div>
     </div>
   </div>
-
 </div>

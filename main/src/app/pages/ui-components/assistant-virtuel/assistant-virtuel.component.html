@@ -23,6 +23,11 @@
                  [ngClass]="message.sender">
               {{ message.text }}
             </div>
+            <div class="message bot typing-indicator" *ngIf="botTyping">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
           </div>
 
           <div class="chat-input">
