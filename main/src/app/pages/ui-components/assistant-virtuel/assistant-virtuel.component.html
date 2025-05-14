@@ -18,16 +18,18 @@
       <div class="chat-content" [class.show-history]="showHistory">
         <div class="chat-main">
           <div class="chat-messages">
-            <div *ngFor="let message of currentConversation.messages" 
-                 class="message"
-                 [ngClass]="message.sender">
-              {{ message.text }}
+            <div *ngFor="let message of conversationcourante.messages" >
+              <div class="message user" >{{ message.texteMessage }}</div>
+              <div class="message bot" *ngIf="message.texteReponse">{{ message.texteReponse }}</div>
             </div>
+            
+
             <div class="message bot typing-indicator" *ngIf="botTyping">
               <span class="dot"></span>
               <span class="dot"></span>
               <span class="dot"></span>
             </div>
+
           </div>
 
           <div class="chat-input">
@@ -40,19 +42,21 @@
 
         <div class="chat-history">
           <div class="new-conversation">
-            <button mat-raised-button class="new-conversation-btn" (click)="createNewConversation()">
+            <button mat-raised-button class="new-conversation-btn" (click)="createNewConversation2()">
               <mat-icon>add</mat-icon>
               Nouvelle conversation
             </button>
           </div>
+
           <div class="history-list">
-            <div *ngFor="let conversation of conversations" 
-                 class="history-item"
-                 [class.active]="conversation.id === currentConversation.id"
-                 (click)="selectConversation(conversation)">
-              <div>{{ conversation.title }}</div>
+            <div *ngFor="let conversation of conversations2" 
+                class="history-item"
+                (click)="selectConversation2(conversation)"
+                [class.active]="conversation.id_conversation === conversationcourante.id_conversation"
+                >
+              <div>conversation :{{ conversation.id_conversation }}</div>
               <div style="color: #666; font-size: 0.9em;">
-                {{ conversation.date | date:'short' }}
+                {{ conversation.dateCreation | date:'short' }}
               </div>
             </div>
           </div>

@@ -7,12 +7,9 @@ export class Message {
     texteReponse:String;
     intention:String;
     conversation:Conversation
-    constructor(id_message: Number,timestamp: Date,texteMessage: string,texteReponse: string,intention: string,conversation:Conversation) {
-        this.id_message=id_message;
+    constructor(timestamp: Date,texteMessage: string,conversation:Conversation) {
         this.timestamp = timestamp;
         this.texteMessage = texteMessage;
-        this.texteReponse = texteReponse;
-        this.intention = intention;
         this.conversation=conversation;
         }
     

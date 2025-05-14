@@ -48,10 +48,6 @@ displayedColumns: string[] = [
       console.log('transferts reçus depuis le backend:', data);
       this.Transferts = data;
     });
-    
-
-    
-
   
 }
 }

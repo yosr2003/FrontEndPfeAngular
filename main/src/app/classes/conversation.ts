@@ -1,14 +1,16 @@
 import { Employe } from "./employe";
+import { Message } from "./message";
 
 export class Conversation {
     id_conversation: Number;
     employe: Employe;
     dateCreation:Date;
-    constructor(id_conversation: Number,
+    messages: Message[];
+    constructor(
             employe: Employe,
             dateCreation: Date) {
-            this.id_conversation=id_conversation;
             this.employe = employe;
             this.dateCreation = dateCreation;
+            this.messages=this.messages;
         }
 }
