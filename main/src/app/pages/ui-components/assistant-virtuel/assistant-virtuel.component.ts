@@ -230,12 +230,19 @@ ngOnInit() {
 
   this.newMessage = '';
   this.botTyping = true;
-
-  this.chatService.sendMessage(texteMessage).subscribe({
+  
+  this.chatService.sendMessage(this.conversationcourante.messages).subscribe({
     next: (response) => {
       this.botTyping = false;
-      message.texteReponse = response;
+      console.log(response);
+      message.texteReponse = response.texteReponse;
       this.scrollToBottom();
+      response.conversation=this.conversationcourante;
+      response.timestamp=new Date();
+      this.ConversationService.addMessage(response).subscribe({
+        next: (resultat) => console.log('Message enregistré avec succès',resultat),
+        error: (err) => console.error('Erreur enregistrement message :', err)
+      });
     },
     error: () => {
       this.botTyping = false;

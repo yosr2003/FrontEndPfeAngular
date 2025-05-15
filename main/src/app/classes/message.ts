@@ -6,6 +6,7 @@ export class Message {
     texteMessage:String;
     texteReponse:String;
     intention:String;
+    entites: { [key: string]: string }; 
     conversation:Conversation
     constructor(timestamp: Date,texteMessage: string,conversation:Conversation) {
         this.timestamp = timestamp;

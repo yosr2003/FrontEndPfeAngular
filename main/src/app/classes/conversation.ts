@@ -13,4 +13,5 @@ export class Conversation {
             this.dateCreation = dateCreation;
             this.messages=this.messages;
         }
+    
 }

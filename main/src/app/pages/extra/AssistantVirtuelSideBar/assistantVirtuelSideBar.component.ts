@@ -82,44 +82,37 @@ export class AppAssistantVirtuelSideBar {
   }
 
   sendMessage() {
-  if (!this.newMessage.trim()) return;
+  // if (!this.newMessage.trim()) return;
 
-  const message = this.newMessage;
-  this.currentConversation.messages.push({
-    text: message,
-    sender: 'user',
-    timestamp: new Date()
-  });
-
-  this.newMessage = '';
-  this.botTyping = true;
-
-  // this.chatService.sendMessage(message).subscribe((response) => {
-  //   this.currentConversation.messages.push({
-  //     text: response,
-  //     sender: 'bot',
-  //     timestamp: new Date()
-  //   });
+  // const message = this.newMessage;
+  // this.currentConversation.messages.push({
+  //   text: message,
+  //   sender: 'user',
+  //   timestamp: new Date()
   // });
-  this.chatService.sendMessage(message).subscribe({
-    next: (response) => {
-      this.botTyping = false;
-      this.currentConversation.messages.push({
-        text: response,
-        sender: 'bot',
-        timestamp: new Date()
-      });
-      this.scrollToBottom();
-    },
-    error: () => {
-      this.botTyping = false;
-      this.currentConversation.messages.push({
-        text: "Erreur lors de la communication avec le serveur.",
-        sender: 'bot',
-        timestamp: new Date()
-      });
-    }
-  });
+
+  // this.newMessage = '';
+  // this.botTyping = true;
+
+  // this.chatService.sendMessage(message).subscribe({
+  //   next: (response) => {
+  //     this.botTyping = false;
+  //     this.currentConversation.messages.push({
+  //       text: response,
+  //       sender: 'bot',
+  //       timestamp: new Date()
+  //     });
+  //     this.scrollToBottom();
+  //   },
+  //   error: () => {
+  //     this.botTyping = false;
+  //     this.currentConversation.messages.push({
+  //       text: "Erreur lors de la communication avec le serveur.",
+  //       sender: 'bot',
+  //       timestamp: new Date()
+  //     });
+  //   }
+  // });
   }
   
 }
