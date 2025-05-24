@@ -275,5 +275,14 @@
   flex-shrink: 0;
 }
 
+.message.bot.pdf-message .bubble {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+
 /* Rest of your existing styles (typing indicator, etc.) can remain the same */
 

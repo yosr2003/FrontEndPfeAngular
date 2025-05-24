@@ -13,18 +13,7 @@ import { Conversation } from 'src/app/classes/conversation';
 import { Message } from 'src/app/classes/message';
 import { Employe } from 'src/app/classes/employe';
 
-interface IMessage {
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
 
-interface IConversation {
-  id: number;
-  date: Date;
-  title: string;
-  messages: IMessage[];
-}
 @Component({
   selector: 'app-assistant-virtuel',
   standalone: true,
@@ -40,41 +29,14 @@ export class AssistantVirtuelComponent {
   showHistory = false;
   newMessage = '';
   isSidebarVisible = false;
-  currentConversation: IConversation;
   conversationcourante:Conversation;
   sidebarSubscription: Subscription;
-  conversations2:Conversation[]=[];
-  conversations: IConversation[] = [
-    { 
-      id: 1, 
-      date: new Date(), 
-      title: 'Conversation 1',
-      messages: [
-        {
-          text: 'Bonjour, je suis votre assistant virtuel, comment puis-je vous aider?',
-          sender: 'bot',
-          timestamp: new Date()
-        }
-      ]
-    },
-    { 
-      id: 2, 
-      date: new Date(Date.now() - 86400000), 
-      title: 'Conversation 2',
-      messages: []
-    },
-    { 
-      id: 3, 
-      date: new Date(Date.now() - 172800000), 
-      title: 'Conversation 3',
-      messages: []
-    }
-  ];
+  conversations:Conversation[]=[];
+
 
 // dans assistant-virtuel.component.ts
 constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService) {
-  this.currentConversation = this.conversations[0];
-  this.conversationcourante=this.conversations2[0];
+  this.conversationcourante=this.conversations[0];
   
   
 }
@@ -90,7 +52,7 @@ ngOnInit() {
 
   this.ConversationService.getAllConversations().pipe(
   tap(data => {
-    this.conversations2 = data;
+    this.conversations = data;
     if (data.length === 0) {
       throw new Error("No conversations found");
     }
@@ -134,26 +96,8 @@ ngOnInit() {
     this.showHistory = !this.showHistory;
   }
 
-  createNewConversation() {
-    const newId = Math.max(...this.conversations.map(c => c.id)) + 1;
-    const newConversation: IConversation = {
-      id: newId,
-      date: new Date(),
-      title: `Conversation ${newId}`,
-      messages: [
-        {
-          text: 'Bonjour, je suis votre assistant virtuel, comment puis-je vous aider?',
-          sender: 'bot',
-          timestamp: new Date()
-        }
-      ]
-    };
-    
-    this.conversations.unshift(newConversation);
-    this.selectConversation(newConversation);
-  }
 
-  createNewConversation2() {
+  createNewConversation() {
     const employe = new Employe(1, '', '', '', '', '');
     const newConversation = new Conversation(
     employe,
@@ -167,16 +111,13 @@ ngOnInit() {
     console.error("Erreur lors de la création :", err);
     }
     });
-    this.conversations2.unshift(newConversation);
-    this.selectConversation2(newConversation);
+    this.conversations.unshift(newConversation);
+    this.selectConversation(newConversation);
     
   }
 
-  selectConversation(conversation: IConversation) {
-    this.currentConversation = conversation;
-    this.showHistory = false;
-  }
-  selectConversation2(conversation: Conversation) {
+  
+  selectConversation(conversation: Conversation) {
     this.conversationcourante = conversation;
     this.showHistory = false;
     this.ConversationService.getMessagesByConversation(conversation.id_conversation).subscribe(data => {
@@ -185,41 +126,6 @@ ngOnInit() {
       console.log("les messages",this.conversationcourante.messages)
       });
   }
-
-
-//   sendMessage() {
-//   if (!this.newMessage.trim()) return;
-
-//   const message = this.newMessage;
-//   this.currentConversation.messages.push({
-//     text: message,
-//     sender: 'user',
-//     timestamp: new Date()
-//   });
-
-//   this.newMessage = '';
-//   this.botTyping = true;
-
-//   this.chatService.sendMessage(message).subscribe({
-//     next: (response) => {
-//       this.botTyping = false;
-//       this.currentConversation.messages.push({
-//         text: response,
-//         sender: 'bot',
-//         timestamp: new Date()
-//       });
-//       this.scrollToBottom();
-//     },
-//     error: () => {
-//       this.botTyping = false;
-//       this.currentConversation.messages.push({
-//         text: "Erreur lors de la communication avec le serveur.",
-//         sender: 'bot',
-//         timestamp: new Date()
-//       });
-//     }
-//   });
-// }
 
   sendMessage() {
   if (!this.newMessage.trim()) return;
@@ -236,6 +142,8 @@ ngOnInit() {
       this.botTyping = false;
       console.log(response);
       message.texteReponse = response.texteReponse;
+      message.intention=response.intention;
+      message.entites=response.entites;
       this.scrollToBottom();
       response.conversation=this.conversationcourante;
       response.timestamp=new Date();

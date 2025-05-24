@@ -8,18 +8,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { AssistantStateService } from '../assistant-state.service';
 import { HttpClient } from '@angular/common/http';
 import { ChatService } from 'src/app/services/chat.service';
-interface Message {
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
+import { Conversation } from 'src/app/classes/conversation';
+import { ConversationService } from 'src/app/services/conversation.service';
+import { switchMap, tap } from 'rxjs';
+import { Message } from 'src/app/classes/message';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-interface Conversation {
-  id: number;
-  date: Date;
-  title: string;
-  messages: Message[];
-}
 @Component({
   selector: 'app-assistantVirtuelSideBar',
   imports: [MaterialModule, CommonModule, FormsModule, MatButtonModule, MatInputModule, MatIconModule],
@@ -28,46 +22,33 @@ interface Conversation {
 })
 export class AppAssistantVirtuelSideBar { 
   newMessage = '';
-  currentConversation: Conversation;
   botTyping = false;
-  conversations: Conversation[] = [
-    { 
-      id: 1, 
-      date: new Date(), 
-      title: 'Conversation 1',
-      messages: [
-        {
-          text: 'Bonjour, je suis votre assistant virtuel, comment puis-je vous aider?',
-          sender: 'bot',
-          timestamp: new Date()
-        }
-      ]
-    },
-    { 
-      id: 2, 
-      date: new Date(Date.now() - 86400000), 
-      title: 'Conversation 2',
-      messages: []
-    },
-    { 
-      id: 3, 
-      date: new Date(Date.now() - 172800000), 
-      title: 'Conversation 3',
-      messages: []
-    }
-  ];
-  contacts = [
-    { name: 'James Johnson', lastMessage: 'Hey, how are you?' },
-    { name: 'Maria Hernandez', lastMessage: 'Lorem Ipsum done' },
-    { name: 'David Smith', lastMessage: 'Thanks mate' },
-    { name: 'Maria Rodriguez', lastMessage: 'This is my chat' }
-  ];
+  conversations:Conversation[]=[];
+  conversationcourante:Conversation;
   
-  constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService) {
-  this.currentConversation = this.conversations[0];}
+  constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer) {
+  this.conversationcourante = this.conversations[0];}
 
   ngOnInit() {
     this.assistantStateService.openSidebar(); 
+    this.ConversationService.getAllConversations().pipe(
+      tap(data => {
+        this.conversations = data;
+        if (data.length === 0) {
+          throw new Error("No conversations found");
+        }
+        this.conversationcourante = data[0];
+      }),
+      switchMap(() => this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation))
+      ).subscribe({
+      next: messages => {
+        this.conversationcourante.messages = messages;
+        console.log("les messages", this.conversationcourante.messages);
+      },
+      error: err => {
+        console.error("An error occurred:", err);
+      }
+      });
   }
 
   ngOnDestroy() {
@@ -82,37 +63,48 @@ export class AppAssistantVirtuelSideBar {
   }
 
   sendMessage() {
-  // if (!this.newMessage.trim()) return;
+  if (!this.newMessage.trim()) return;
 
-  // const message = this.newMessage;
-  // this.currentConversation.messages.push({
-  //   text: message,
-  //   sender: 'user',
-  //   timestamp: new Date()
-  // });
+  const texteMessage = this.newMessage;
+  const message= new Message(new Date(),texteMessage,this.conversationcourante);
+  this.conversationcourante.messages.push(message);
 
-  // this.newMessage = '';
-  // this.botTyping = true;
-
-  // this.chatService.sendMessage(message).subscribe({
-  //   next: (response) => {
-  //     this.botTyping = false;
-  //     this.currentConversation.messages.push({
-  //       text: response,
-  //       sender: 'bot',
-  //       timestamp: new Date()
-  //     });
-  //     this.scrollToBottom();
-  //   },
-  //   error: () => {
-  //     this.botTyping = false;
-  //     this.currentConversation.messages.push({
-  //       text: "Erreur lors de la communication avec le serveur.",
-  //       sender: 'bot',
-  //       timestamp: new Date()
-  //     });
-  //   }
-  // });
+  this.newMessage = '';
+  this.botTyping = true;
+  
+  this.chatService.sendMessage(this.conversationcourante.messages).subscribe({
+    next: (response) => {
+      this.botTyping = false;
+      console.log(response);
+      message.texteReponse = response.texteReponse;
+      message.intention=response.intention;
+      message.entites=response.entites;
+      this.scrollToBottom();
+      response.conversation=this.conversationcourante;
+      response.timestamp=new Date();
+      this.ConversationService.addMessage(response).subscribe({
+        next: (resultat) => console.log('Message enregistré avec succès',resultat),
+        error: (err) => console.error('Erreur enregistrement message :', err)
+      });
+    },
+    error: () => {
+      this.botTyping = false;
+      message.texteReponse = "Erreur lors de la communication avec le serveur.";
+    }
+  });
   }
+
+  isPdfLink(text: string): boolean {
+  return text.includes('/Swift') || text.includes('.pdf');
+  //return true;
+  }
+
+  sanitizePdfUrl(url: string): SafeResourceUrl {
+  // si ce n’est pas un lien complet, on le complète
+  if (!url.startsWith('http')) {
+    url = 'http://localhost:8084' + url;
+  }
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  } 
   
 }

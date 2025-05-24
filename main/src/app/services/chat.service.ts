@@ -14,8 +14,9 @@ export class ChatService {
     texteMessage: m.texteMessage,
     texteReponse: m.texteReponse|| null,
     intention: m.intention|| null,
+    entites: m.entites|| null,
     }));
-    console.log("test",messagesToSend);
+    console.log("les messages a envoyees",messagesToSend);
     return this.http.post<Message>(`${this.baseUrl}/chat`,messagesToSend).pipe(catchError(this.handleError));
   }
 

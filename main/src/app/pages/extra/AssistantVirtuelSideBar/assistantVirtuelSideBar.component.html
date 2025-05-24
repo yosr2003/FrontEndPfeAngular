@@ -8,10 +8,24 @@
     <div class="chat-content-wrapper">
       <div class="messages-container">
         <div class="messages">
-          <div *ngFor="let message of currentConversation.messages" class="message" [ngClass]="message.sender">
-            <div class="bubble">{{ message.text }}</div>
-          </div>
-
+          <div *ngFor="let message of conversationcourante.messages" >
+            <div class="message user" *ngIf="message.texteMessage">
+              <div class="bubble">{{ message.texteMessage }}</div>
+            </div>
+            <!-- <div class="message bot" *ngIf="message.texteReponse">
+              <div class="bubble">{{ message.texteReponse }}</div>
+            </div> -->
+              <!-- Message bot -->
+            <div class="message bot" *ngIf="message.texteReponse" [ngClass]="{ 'pdf-message': isPdfLink(message.texteReponse) }">
+              <div class="bubble">
+                <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
+                  <!-- Affichage PDF inline -->
+                   <iframe [src]="sanitizePdfUrl(message.texteReponse)" width="70%" height="400" style="border: none;"></iframe>
+                    
+                </ng-container>
+                <ng-template #textOnly>{{ message.texteReponse }}</ng-template>
+              </div>
+            </div>
           <div class="message bot typing-indicator" *ngIf="botTyping">
             <span class="dot"></span>
             <span class="dot"></span>
