@@ -32,7 +32,8 @@ export const routes: Routes = [
     ],
   },
   {
-    path: '', component: BlankComponent,
+    path: '',
+    component: BlankComponent,
     children: [
       {
         path: 'authentication',

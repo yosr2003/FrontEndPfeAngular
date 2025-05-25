@@ -79,9 +79,9 @@ ngOnInit() {
   }
 
 
-  ngOnDestroy() {
-    this.sidebarSubscription.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   this.sidebarSubscription.unsubscribe();
+  // }
 
   toggleChat() {
     this.isOpen = !this.isOpen;

@@ -16,6 +16,7 @@ export const UiComponentsRoutes: Routes = [
         component: AppTransactionComponent,
       },
       
+      
     ],
   },
 ];

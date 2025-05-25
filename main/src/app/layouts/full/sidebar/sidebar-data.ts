@@ -1,6 +1,7 @@
 import { NavItem } from './nav-item/nav-item';
 
 export const navItems: NavItem[] = [
+  
   {
     navCap: 'Maison',
   },
@@ -31,37 +32,8 @@ export const navItems: NavItem[] = [
     route: '/extra/AssistantVirtuelSideBar',
   },
 
-
-
-  {
-    navCap: 'Auth',
-  },
-  {
-    displayName: 'Login',
-    iconName: 'login',
-    route: '/authentication',
-    children: [
-      {
-        displayName: 'Login',
-        iconName: 'point',
-        route: '/authentication/login',
-      },
-    
-    ],
-  },
-  {
-    displayName: 'Register',
-    iconName: 'user-plus',
-    route: '/authentication',
-    children: [
-      {
-        displayName: 'Register',
-        iconName: 'point',
-        route: '/authentication/register',
-      },
-      
-    ],
-  },
+ 
+  
  
   
 ];
