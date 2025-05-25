@@ -9,7 +9,7 @@ import { DossierDelegue } from '../classes/dossier-delegue';
 })
 export class DossierDelegueService {
 
- private baseUrl = 'http://localhost:8086'; 
+ private baseUrl = 'http://localhost:8089'; 
 
   constructor(private http: HttpClient) { }
   getAllDossiers(): Observable<{ body: DossierDelegue[] }> {
