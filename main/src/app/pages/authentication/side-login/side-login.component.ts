@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -30,6 +30,8 @@ import { ERole } from 'src/app/classes/role';
     MatCardModule,
   ],
   templateUrl: './side-login.component.html',
+  styleUrls: ['./side-login.component.scss'],
+ 
 })
 export class AppSideLoginComponent {
   form = new FormGroup({
