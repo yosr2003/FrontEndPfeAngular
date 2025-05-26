@@ -12,7 +12,8 @@ export const ExtraRoutes: Routes = [
     children: [
       {
         path: 'AssistantVirtuelSideBar',
-        component: AppAssistantVirtuelSideBar, canActivate: [AuthGuard]
+        component: AppAssistantVirtuelSideBar, 
+        // canActivate: [AuthGuard]
       },
     ],
   },
