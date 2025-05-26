@@ -12,6 +12,7 @@ import { ConversationService } from 'src/app/services/conversation.service';
 import { Conversation } from 'src/app/classes/conversation';
 import { Message } from 'src/app/classes/message';
 import { Employe } from 'src/app/classes/employe';
+import { ERole } from 'src/app/classes/role';
 
 
 @Component({
@@ -98,7 +99,7 @@ ngOnInit() {
 
 
   createNewConversation() {
-    const employe = new Employe(1, '', '', '', '', '');
+    const employe = new Employe(1, '', '', '', ''); //------------je l'ai modifié
     const newConversation = new Conversation(
     employe,
     new Date() // or new Date('2025-05-15T10:50:00Z') if specific

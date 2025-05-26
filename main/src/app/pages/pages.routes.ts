@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
 import { StarterComponent } from './starter/starter.component';
+import { AuthGuard } from '../Guards/auth-guards.guard';
 
 export const PagesRoutes: Routes = [
   {
     path: '',
-    component: StarterComponent,
+    component: StarterComponent, canActivate: [AuthGuard],
     data: {
       title: 'Starter Page',
       urls: [

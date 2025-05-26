@@ -15,7 +15,7 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () =>
-          import('./pages/pages.routes').then((m) => m.PagesRoutes),
+          import('./pages/pages.routes').then((m) => m.PagesRoutes),  
       },
       {
         path: 'ui-components',

@@ -6,6 +6,6 @@ export interface loginResponse{
     nom : string;
     prenom:string;    
     email :string;
-    role: string;
+    roles: string[];
 }
 

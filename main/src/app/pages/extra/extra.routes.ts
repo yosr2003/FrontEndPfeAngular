@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 
 
 import { AppAssistantVirtuelSideBar } from './AssistantVirtuelSideBar/assistantVirtuelSideBar.component';
+import { AuthGuard } from 'src/app/Guards/auth-guards.guard';
 
 
 export const ExtraRoutes: Routes = [
@@ -11,7 +12,7 @@ export const ExtraRoutes: Routes = [
     children: [
       {
         path: 'AssistantVirtuelSideBar',
-        component: AppAssistantVirtuelSideBar,
+        component: AppAssistantVirtuelSideBar, canActivate: [AuthGuard]
       },
     ],
   },

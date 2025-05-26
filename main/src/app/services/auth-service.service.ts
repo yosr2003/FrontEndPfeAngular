@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { Employe } from '../classes/employe';
 import { TokenStorageService } from './token-storage-service.service';
 import { loginResponse } from '../classes/loginResponse';
+import { LoginRequest } from '../classes/LoginRequest';
 
 
 
@@ -14,7 +15,7 @@ import { loginResponse } from '../classes/loginResponse';
 })
 export class AuthService {
 
-  userUrl: string = 'http://localhost:8090/api/auth';
+  userUrl: string = 'http://localhost:8085/api/auth';
 
   constructor(private httpClientauth: HttpClient, private sessionStorage:TokenStorageService) {}
 
@@ -26,9 +27,10 @@ export class AuthService {
   }
 
 
-login(user: Employe): Observable<loginResponse> {
-  return this.httpClientauth.post<loginResponse>(this.userUrl + '/login', user);
+login(loginData: LoginRequest): Observable<loginResponse> {
+  return this.httpClientauth.post<loginResponse>(this.userUrl + '/login', loginData);
 }
+
 
 
   logout() {

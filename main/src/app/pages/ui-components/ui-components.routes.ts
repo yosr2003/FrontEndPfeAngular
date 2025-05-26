@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AppDossiersDeleguesComponent, } from './dossiersDelegues/dossiersDelegues.component';
 import { AppTransactionComponent } from './transactions/transaction.component';
+import { AuthGuard } from 'src/app/Guards/auth-guards.guard';
 
 export const UiComponentsRoutes: Routes = [
   {
@@ -9,11 +10,11 @@ export const UiComponentsRoutes: Routes = [
     children: [
       {
         path: 'dossiersDelegues',
-        component: AppDossiersDeleguesComponent,
+        component: AppDossiersDeleguesComponent, canActivate: [AuthGuard]
       },
       {
         path: 'transactions',
-        component: AppTransactionComponent,
+        component: AppTransactionComponent, canActivate: [AuthGuard]
       },
       
       

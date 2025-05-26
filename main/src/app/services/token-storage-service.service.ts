@@ -30,5 +30,14 @@ public saveUser(user:any) {
 public getUser(){
 return JSON.parse(sessionStorage.getItem(USER_KEY)!);
 }
+saveRole(role: string) {
+  sessionStorage.setItem('role', role);
+}
+
+getRole(): string | null {
+  return sessionStorage.getItem('role');
+}
+
+
 
 }

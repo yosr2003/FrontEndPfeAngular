@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
+import { ERole } from 'src/app/classes/role';
 
 @Component({
   selector: 'app-side-login',
@@ -38,6 +39,7 @@ export class AppSideLoginComponent {
 
   isLoginFailed = false;
   errorMessage = '';
+  errorMsg: string;
 
   constructor(
     private authService: AuthService,
@@ -50,21 +52,31 @@ export class AppSideLoginComponent {
   }
 
   submit() {
-    const loginData = new Employe(0, '', '', this.f['uname'].value!, this.f['password'].value!, '');
+  const loginData = {
+    email: this.f['uname'].value!,
+    password: this.f['password'].value!
+  };
 
-    this.authService.login(loginData).subscribe({
-      next: (data) => {
-        this.tokenStorage.saveToken(data.accessToken);
-        this.tokenStorage.saveUser(data);
+  this.authService.login(loginData).subscribe({
+    next: (res) => {
+      console.log("Login successful", res);
+      this.tokenStorage.saveToken(res.accessToken);
+        if (res.roles && res.roles.length > 0) {
+      this.tokenStorage.saveRole(res.roles[0]);
+      console.log("res.roles[0]*******************", res.roles[0])
+    }
 
-        this.isLoginFailed = false;
-        this.router.navigate(['/dashboard']); // Rediriger vers le dashboard
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoginFailed = true;
-        this.errorMessage = 'Email ou mot de passe incorrect';
-      },
-    });
-  }
+      this.router.navigate(['/dashboard']);
+    },
+    error: (err) => {
+      console.error("Login failed", err);
+      this.errorMsg = "Email ou mot de passe incorrect";
+    }
+  });
+}
+
+logout() {
+  this.tokenStorage.signOut();
+  this.router.navigate(['/login']);
+}
 }
