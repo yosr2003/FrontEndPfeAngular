@@ -7,7 +7,7 @@ import { Message } from '../classes/message';
 @Injectable({
   providedIn: 'root'
 })
-export class ConversationService {private baseUrl = 'http://localhost:8084'; 
+export class ConversationService {private baseUrl = 'http://localhost:8085'; 
   constructor(private http: HttpClient) { }
   getAllConversations():Observable<Conversation[]>{
     return this.http.get<Conversation[]>(`${this.baseUrl}/conversations`).pipe(catchError(this.handleError));
