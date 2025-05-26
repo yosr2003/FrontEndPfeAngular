@@ -1,27 +1,53 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { Conversation } from '../classes/conversation';
 import { Message } from '../classes/message';
+import { TokenStorageService } from './token-storage-service.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConversationService {private baseUrl = 'http://localhost:8085'; 
-  constructor(private http: HttpClient) { }
-  getAllConversations():Observable<Conversation[]>{
-    return this.http.get<Conversation[]>(`${this.baseUrl}/conversations`).pipe(catchError(this.handleError));
-  }
+  constructor(private http: HttpClient, private tokenStorage: TokenStorageService) { }
+      getAllConversations(): Observable<Conversation[]> {
+        const token = this.tokenStorage.getToken();
+
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+        return this.http.get<Conversation[]>(
+          `${this.baseUrl}/conversations`,  { headers }
+        ).pipe(
+          catchError(this.handleError)
+        );
+      }
+
   getMessagesByConversation(id:Number):Observable<Message[]>{
-     return this.http.get<Message[]>(`${this.baseUrl}/messages/${id}`).pipe(catchError(this.handleError));
+         const token = this.tokenStorage.getToken(); 
+    
+        const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+        });
+     return this.http.get<Message[]>(`${this.baseUrl}/messages/${id}`,{ headers }).pipe(catchError(this.handleError));
   }
 
   addConversation(conversation: Conversation): Observable<Conversation> {
-  return this.http.post<Conversation>(`${this.baseUrl}/conversations`, conversation)
+         const token = this.tokenStorage.getToken(); 
+    
+        const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+        });
+  return this.http.post<Conversation>(`${this.baseUrl}/conversations`, conversation,{ headers })
     .pipe(catchError(this.handleError));
   }
 
   addMessage(message: Message): Observable<Message> {
+
+         const token = this.tokenStorage.getToken(); 
+    
+        const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+        });
     const messageAEnvoyer = {
     texteMessage: message.texteMessage,
     //texteReponse: "essaie test ",
@@ -33,7 +59,7 @@ export class ConversationService {private baseUrl = 'http://localhost:8085';
       id_conversation: message.conversation.id_conversation
     }
   };
-  return this.http.post<Message>(`${this.baseUrl}/messages`, messageAEnvoyer)
+  return this.http.post<Message>(`${this.baseUrl}/messages`, messageAEnvoyer,{ headers })
     .pipe(catchError(this.handleError));
   }
 
