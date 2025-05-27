@@ -18,12 +18,13 @@ export class ChatService {
     entites: m.entites|| null,
     }));
     console.log("les messages a envoyees",messagesToSend);
-    const token = this.tokenStorage.getToken(); // Assure-toi d'importer tokenStorageService
+    //const token = this.tokenStorage.getToken(); // Assure-toi d'importer tokenStorageService
 
-    const headers = new HttpHeaders({
-    'Authorization': `Bearer ${token}`
-    });
-    return this.http.post<Message>(`${this.baseUrl}/chat`,messagesToSend,{ headers }).pipe(catchError(this.handleError));
+    // const headers = new HttpHeaders({
+    // 'Authorization': `Bearer ${token}`
+    // });
+    //{ headers }
+    return this.http.post<Message>(`${this.baseUrl}/chat`,messagesToSend).pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse) {
