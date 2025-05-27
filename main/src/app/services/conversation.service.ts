@@ -8,7 +8,7 @@ import { TokenStorageService } from './token-storage-service.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ConversationService {private baseUrl = 'http://localhost:8085'; 
+export class ConversationService {private baseUrl = 'http://localhost:8089'; 
   constructor(private http: HttpClient, private tokenStorage: TokenStorageService) { }
       getAllConversations(): Observable<Conversation[]> {
         // const token = this.tokenStorage.getToken();
