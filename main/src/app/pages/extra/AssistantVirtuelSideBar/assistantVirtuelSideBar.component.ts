@@ -6,13 +6,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { AssistantStateService } from '../assistant-state.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ChatService } from 'src/app/services/chat.service';
 import { Conversation } from 'src/app/classes/conversation';
 import { ConversationService } from 'src/app/services/conversation.service';
-import { switchMap, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { Message } from 'src/app/classes/message';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Employe } from 'src/app/classes/employe';
+import { TokenStorageService } from 'src/app/services/token-storage-service.service';
 
 @Component({
   selector: 'app-assistantVirtuelSideBar',
@@ -23,32 +25,47 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 export class AppAssistantVirtuelSideBar { 
   newMessage = '';
   botTyping = false;
+  showHistory = false;
+  pdfBlobUrls = new Map<string, SafeResourceUrl>();
   conversations:Conversation[]=[];
   conversationcourante:Conversation;
   
-  constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer) {
+  
+  constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService) {
   this.conversationcourante = this.conversations[0];}
 
   ngOnInit() {
     this.assistantStateService.openSidebar(); 
     this.ConversationService.getAllConversations().pipe(
-      tap(data => {
+    switchMap(data => {
+      if (data.length === 0) {
+        // Appel ta nouvelle version de createNewConversation()
+        return this.createNewConversation().pipe(
+          switchMap(created =>
+            this.ConversationService.getMessagesByConversation(created.id_conversation).pipe(
+              tap(messages => {
+                created.messages = messages;
+                this.conversationcourante = created;
+              })
+            )
+          )
+        );
+      } else {
         this.conversations = data;
-        if (data.length === 0) {
-          throw new Error("No conversations found");
-        }
         this.conversationcourante = data[0];
-      }),
-      switchMap(() => this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation))
-      ).subscribe({
-      next: messages => {
-        this.conversationcourante.messages = messages;
-        console.log("les messages", this.conversationcourante.messages);
-      },
-      error: err => {
-        console.error("An error occurred:", err);
+        return this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation).pipe(
+          tap(messages => {this.conversationcourante.messages = messages;messages.forEach(msg => this.checkAndLoadPdf(msg))})
+        );
       }
-      });
+    })
+  ).subscribe({
+    next: () => {
+      console.log("Conversation courante :", this.conversationcourante);
+    },
+    error: err => {
+      console.error("Erreur :", err);
+    }
+  });
   }
 
   ngOnDestroy() {
@@ -79,6 +96,7 @@ export class AppAssistantVirtuelSideBar {
       message.texteReponse = response.texteReponse;
       message.intention=response.intention;
       message.entites=response.entites;
+      this.checkAndLoadPdf(message);
       this.scrollToBottom();
       response.conversation=this.conversationcourante;
       response.timestamp=new Date();
@@ -93,18 +111,87 @@ export class AppAssistantVirtuelSideBar {
     }
   });
   }
+  createNewConversation(): Observable<Conversation>{
+      const employe = new Employe(1, '', '', '', ''); 
+      const newConversation = new Conversation(
+      employe,
+      new Date() 
+      );
+      return this.ConversationService.addConversation(newConversation).pipe(
+      tap(createdConversation => {
+        console.log("Conversation créée :", createdConversation);
+        this.conversations.unshift(createdConversation);
+        this.selectConversation(createdConversation); // Optionnel : sélectionne direct
+      })
+    );
+    }
+  selectConversation(conversation: Conversation) {
+    this.conversationcourante = conversation;
+    this.showHistory = false;
+    this.ConversationService.getMessagesByConversation(conversation.id_conversation).subscribe(data => {
+      console.log(data);
+      this.conversationcourante.messages= data;
+      console.log("les messages",this.conversationcourante.messages)
+      });
+  }
 
   isPdfLink(text: string): boolean {
   return text.includes('/Swift') || text.includes('.pdf');
   //return true;
   }
 
-  sanitizePdfUrl(url: string): SafeResourceUrl {
-  // si ce n’est pas un lien complet, on le complète
-  if (!url.startsWith('http')) {
-    url = 'http://localhost:8084' + url;
+  // sanitizePdfUrl(url: string): SafeResourceUrl {
+  // // si ce n’est pas un lien complet, on le complète
+  // if (!url.startsWith('http')) {
+  //   url = 'http://localhost:8084' + url;
+  // }
+  // return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  // }
+  sanitizePdfUrl(url: string): SafeResourceUrl | null {
+  if (this.pdfBlobUrls.has(url)) {
+    return this.pdfBlobUrls.get(url)!;
   }
-  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+  let fullUrl = url.startsWith('http') ? url : 'http://localhost:8084' + url;
+
+  this.http.get(fullUrl, {
+    responseType: 'blob',
+    headers: {
+      Authorization: `Bearer ${this.tokenStorage.getToken()}`  // remplace avec ton système d'auth
+    }
+  }).subscribe(blob => {
+    const blobUrl = URL.createObjectURL(blob);
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+    this.pdfBlobUrls.set(url, safeUrl);
+  });
+
+  return null; // temporairement, on n’a pas encore le blob
   } 
+
+  checkAndLoadPdf(message: Message) {
+  const url = message.texteReponse;
+  if (this.isPdfLink(url) && !this.pdfBlobUrls.has(url)) {
+    this.sanitizePdfUrl(url); // va lancer le chargement async
+  }
+  }
+
+
+ 
+
+
+ 
+ 
+  //  toggleChat() {
+  //   this.isOpen = !this.isOpen;
+  //   if (this.isOpen) {
+  //     this.hasNotification = false;
+  //     this.showBubble = false;
+  //     this.showHistory = false;
+  //   }
+  // }
+
+  // toggleHistory() {
+  //   this.showHistory = !this.showHistory;
+  // }
   
 }

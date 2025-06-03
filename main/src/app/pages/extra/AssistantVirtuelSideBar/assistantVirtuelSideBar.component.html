@@ -18,11 +18,13 @@
               <!-- Message bot -->
             <div class="message bot" *ngIf="message.texteReponse" [ngClass]="{ 'pdf-message': isPdfLink(message.texteReponse) }">
               <div class="bubble">
-                <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
-                  <!-- Affichage PDF inline -->
+                <!-- <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
                    <iframe [src]="sanitizePdfUrl(message.texteReponse)" width="70%" height="400" style="border: none;"></iframe>
-                    
+                </ng-container> -->
+                <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
+                  <iframe *ngIf="pdfBlobUrls.get(message.texteReponse)" [src]="pdfBlobUrls.get(message.texteReponse)" width="70%" height="400" style="border: none;"></iframe>
                 </ng-container>
+
                 <ng-template #textOnly>{{ message.texteReponse }}</ng-template>
               </div>
             </div>

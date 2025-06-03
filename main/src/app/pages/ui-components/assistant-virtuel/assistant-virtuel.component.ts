@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { AssistantStateService } from '../../extra/assistant-state.service';
-import { Subscription, switchMap, tap } from 'rxjs';
+import { Observable, Subscription, switchMap, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ChatService } from 'src/app/services/chat.service';
 import { ConversationService } from 'src/app/services/conversation.service';
@@ -13,6 +13,7 @@ import { Conversation } from 'src/app/classes/conversation';
 import { Message } from 'src/app/classes/message';
 import { Employe } from 'src/app/classes/employe';
 import { ERole } from 'src/app/classes/role';
+import { consumerAfterComputation } from '@angular/core/primitives/signals';
 
 
 @Component({
@@ -50,27 +51,37 @@ ngOnInit() {
       this.isOpen = false;
     }
   });
-
   this.ConversationService.getAllConversations().pipe(
-  tap(data => {
-    this.conversations = data;
-    if (data.length === 0) {
-      throw new Error("No conversations found");
-    }
-    this.conversationcourante = data[0];
-  }),
-  switchMap(() => this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation))
+    switchMap(data => {
+      if (data.length === 0) {
+        // Appel ta nouvelle version de createNewConversation()
+        return this.createNewConversation().pipe(
+          switchMap(created =>
+            this.ConversationService.getMessagesByConversation(created.id_conversation).pipe(
+              tap(messages => {
+                created.messages = messages;
+                this.conversationcourante = created;
+              })
+            )
+          )
+        );
+      } else {
+        this.conversations = data;
+        this.conversationcourante = data[0];
+        return this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation).pipe(
+          tap(messages => this.conversationcourante.messages = messages)
+        );
+      }
+    })
   ).subscribe({
-  next: messages => {
-    this.conversationcourante.messages = messages;
-    console.log("les messages", this.conversationcourante.messages);
-  },
-  error: err => {
-    console.error("An error occurred:", err);
-  }
+    next: () => {
+      console.log("Conversation courante :", this.conversationcourante);
+    },
+    error: err => {
+      console.error("Erreur :", err);
+    }
   });
 
-  
 }
   scrollToBottom() {
   const chatMessages = document.querySelector('.chat-messages');
@@ -98,24 +109,31 @@ ngOnInit() {
   }
 
 
-  createNewConversation() {
-    const employe = new Employe(1, '', '', '', ''); //------------je l'ai modifié
+  createNewConversation(): Observable<Conversation>{
+    const employe = new Employe(1, '', '', '', ''); 
     const newConversation = new Conversation(
     employe,
-    new Date() // or new Date('2025-05-15T10:50:00Z') if specific
+    new Date() 
     );
-    this.ConversationService.addConversation(newConversation).subscribe({
+    return this.ConversationService.addConversation(newConversation).pipe(
+    tap(createdConversation => {
+      console.log("Conversation créée :", createdConversation);
+      this.conversations.unshift(createdConversation);
+      this.selectConversation(createdConversation); // Optionnel : sélectionne direct
+    })
+  );
+  }
+  onNewConversationClicked() {
+  this.createNewConversation().subscribe({
     next: (createdConversation) => {
-    console.log("Conversation créée :", createdConversation);
+      this.selectConversation(createdConversation);
     },
     error: (err) => {
-    console.error("Erreur lors de la création :", err);
+      console.error("Erreur :", err);
     }
-    });
-    this.conversations.unshift(newConversation);
-    this.selectConversation(newConversation);
-    
+  });
   }
+
 
   
   selectConversation(conversation: Conversation) {
