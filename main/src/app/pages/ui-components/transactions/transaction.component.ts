@@ -10,6 +10,7 @@ import { Transfert } from 'src/app/classes/transfert';
 import { TransfertService } from 'src/app/services/transfert.service';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TokenStorageService } from 'src/app/services/token-storage-service.service';
 
 @Component({
   selector: 'app-tables',
@@ -43,7 +44,7 @@ displayedColumns: string[] = [
            'compteCible'
   ];
   Transferts!: Transfert[];
-  constructor(private TransfertService: TransfertService,private sanitizer: DomSanitizer,private http: HttpClient) {
+  constructor(private TransfertService: TransfertService,private sanitizer: DomSanitizer,private http: HttpClient,private tokenStorage: TokenStorageService) {
 }
   ngOnInit() {
   
@@ -52,18 +53,29 @@ displayedColumns: string[] = [
     //   this.Transferts = data;
     // });
     const transfertId = 'TSC792766'; // mets ici un ID existant
+    let url=`http://localhost:8085/etatDeclaration/consulter?typeDeclaration=ACHAT_BIEN&trimestre=T2`;
+    this.http.get(url, {
+  headers: { Authorization: `Bearer ${this.tokenStorage.getToken()}` },
+  responseType: 'blob',
+  observe: 'response'
+}).subscribe({
+  next: (response) => {
+    const contentType = response.headers.get('Content-Type');
+    console.log("Content-Type reçu :", contentType);
+    
 
-    this.http.get(`http://localhost:8084/Swift/${transfertId}`, {
-      responseType: 'blob' // on attend un fichier binaire (PDF)
-    }).subscribe({
-      next: (pdfBlob) => {
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
-      },
-      error: (err) => {
-        console.error("Erreur lors de la récupération du PDF", err);
-      }
-    });
+    const blobUrl = URL.createObjectURL(response.body!);
+    console.log("URL du blob PDF :", blobUrl);
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+
+    
+    console.log("URL sécurisée Angular :", this.pdfUrl);
+  },
+  error: (err) => {
+    console.error("Erreur lors de la récupération du PDF", err);
+  }
+});
+
   
   
 }

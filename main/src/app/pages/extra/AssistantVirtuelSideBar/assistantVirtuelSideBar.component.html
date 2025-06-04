@@ -21,9 +21,15 @@
                 <!-- <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
                    <iframe [src]="sanitizePdfUrl(message.texteReponse)" width="70%" height="400" style="border: none;"></iframe>
                 </ng-container> -->
-                <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
+
+                <!-- <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
                   <iframe *ngIf="pdfBlobUrls.get(message.texteReponse)" [src]="pdfBlobUrls.get(message.texteReponse)" width="70%" height="400" style="border: none;"></iframe>
+                </ng-container> -->
+                <ng-container *ngIf="isPdfLink(message.texteReponse); else textOnly">
+                  <a *ngIf="pdfBlobUrls.get(message.texteReponse)"   [href]="pdfBlobUrls.get(message.texteReponse)" target="_blank" rel="noopener">👉 Cliquez ici pour ouvrir le PDF</a>
+                  <span *ngIf="!pdfBlobUrls.get(message.texteReponse)">📄 Chargement du document...</span>
                 </ng-container>
+
 
                 <ng-template #textOnly>{{ message.texteReponse }}</ng-template>
               </div>

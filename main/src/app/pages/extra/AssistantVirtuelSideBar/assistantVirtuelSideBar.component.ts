@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { MaterialModule } from '../../../material.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -31,7 +31,7 @@ export class AppAssistantVirtuelSideBar {
   conversationcourante:Conversation;
   
   
-  constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService) {
+  constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService,private cdr: ChangeDetectorRef) {
   this.conversationcourante = this.conversations[0];}
 
   ngOnInit() {
@@ -134,25 +134,17 @@ export class AppAssistantVirtuelSideBar {
       console.log("les messages",this.conversationcourante.messages)
       });
   }
-
+  
   isPdfLink(text: string): boolean {
-  return text.includes('/Swift') || text.includes('.pdf');
-  //return true;
+  return text.includes('http://localhost:8085') || text.includes('.pdf');
   }
-
-  // sanitizePdfUrl(url: string): SafeResourceUrl {
-  // // si ce n’est pas un lien complet, on le complète
-  // if (!url.startsWith('http')) {
-  //   url = 'http://localhost:8084' + url;
+  //SafeResourceUrl | null
+  sanitizePdfUrl(url: string): void {
+  // if (this.pdfBlobUrls.has(url)) {
+  //   return this.pdfBlobUrls.get(url)!;
   // }
-  // return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  // }
-  sanitizePdfUrl(url: string): SafeResourceUrl | null {
-  if (this.pdfBlobUrls.has(url)) {
-    return this.pdfBlobUrls.get(url)!;
-  }
-
-  let fullUrl = url.startsWith('http') ? url : 'http://localhost:8084' + url;
+  if (this.pdfBlobUrls.has(url)) return;
+  let fullUrl = url.startsWith('http') ? url : 'http://localhost:8085' + url;
 
   this.http.get(fullUrl, {
     responseType: 'blob',
@@ -163,9 +155,10 @@ export class AppAssistantVirtuelSideBar {
     const blobUrl = URL.createObjectURL(blob);
     const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
     this.pdfBlobUrls.set(url, safeUrl);
+    this.cdr.detectChanges();
   });
 
-  return null; // temporairement, on n’a pas encore le blob
+  //return null; // temporairement, on n’a pas encore le blob
   } 
 
   checkAndLoadPdf(message: Message) {
