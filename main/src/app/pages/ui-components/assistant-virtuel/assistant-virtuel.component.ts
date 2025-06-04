@@ -14,6 +14,10 @@ import { Message } from 'src/app/classes/message';
 import { Employe } from 'src/app/classes/employe';
 import { ERole } from 'src/app/classes/role';
 import { consumerAfterComputation } from '@angular/core/primitives/signals';
+import { TransfertService } from 'src/app/services/transfert.service';
+import { AlertesService } from 'src/app/services/alertes.service';
+import { TokenStorageService } from 'src/app/services/token-storage-service.service';
+import { AmortissementEcheance } from 'src/app/classes/AmortissementEcheance';
 
 
 @Component({
@@ -34,10 +38,19 @@ export class AssistantVirtuelComponent {
   conversationcourante:Conversation;
   sidebarSubscription: Subscription;
   conversations:Conversation[]=[];
+  notificationVisible: boolean = true;
+  transfertsEnAttenteCount: number = 0;
+  userRole: string = '';
+  echeancesEnAlerte: AmortissementEcheance[] = [];
+
+
 
 
 // dans assistant-virtuel.component.ts
-constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService) {
+constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,    private alertesService: AlertesService
+   ,private tokenStorageService: TokenStorageService,
+
+) {
   this.conversationcourante=this.conversations[0];
   
   
@@ -51,6 +64,26 @@ ngOnInit() {
       this.isOpen = false;
     }
   });
+
+const role = this.tokenStorageService.getRole();
+  if (role === 'ROLE_ChargéClientele') {
+    this.userRole=role;
+    this.alertesService.getAlertesEcheances().subscribe(data => {
+       console.log("echeaaaance", data )
+      if (data.length > 0) {
+        this.echeancesEnAlerte = data;
+        this.notificationVisible = true;
+      }
+    });
+  } else {
+    this.alertesService.getTransfertsEnAttente().subscribe(data => {
+      this.transfertsEnAttenteCount = data.length;
+      if (data.length > 0) {
+        this.notificationVisible = true;
+      }
+    });
+  }
+
   this.ConversationService.getAllConversations().pipe(
     switchMap(data => {
       if (data.length === 0) {
@@ -178,4 +211,13 @@ ngOnInit() {
   });
 }
 
+
+
+closeNotification() {
+  this.notificationVisible = false;
 }
+
+
+}
+
+
