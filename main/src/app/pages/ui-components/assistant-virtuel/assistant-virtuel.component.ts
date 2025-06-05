@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,6 +14,8 @@ import { Message } from 'src/app/classes/message';
 import { Employe } from 'src/app/classes/employe';
 import { ERole } from 'src/app/classes/role';
 import { consumerAfterComputation } from '@angular/core/primitives/signals';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TokenStorageService } from 'src/app/services/token-storage-service.service';
 
 
 @Component({
@@ -34,10 +36,13 @@ export class AssistantVirtuelComponent {
   conversationcourante:Conversation;
   sidebarSubscription: Subscription;
   conversations:Conversation[]=[];
+  pdfBlobUrls = new Map<string, SafeResourceUrl>();
+  currentProlongationApiUrl: string | null = null;
+  selectedFile: File | null = null;
 
 
 // dans assistant-virtuel.component.ts
-constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService) {
+constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private cdr: ChangeDetectorRef,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService,) {
   this.conversationcourante=this.conversations[0];
   
   
@@ -69,7 +74,7 @@ ngOnInit() {
         this.conversations = data;
         this.conversationcourante = data[0];
         return this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation).pipe(
-          tap(messages => this.conversationcourante.messages = messages)
+          tap(messages => {this.conversationcourante.messages = messages;messages.forEach(msg => this.checkAndLoadPdf(msg))})
         );
       }
     })
@@ -167,6 +172,7 @@ ngOnInit() {
       message.texteReponse = response.texteReponse;
       message.intention=response.intention;
       message.entites=response.entites;
+      this.checkAndLoadPdf(message);
       this.scrollToBottom();
       response.conversation=this.conversationcourante;
       response.timestamp=new Date();
@@ -181,5 +187,88 @@ ngOnInit() {
     }
   });
 }
+
+isProlongationLink(text: string): boolean {
+  return text.includes('/scolarite/prolonger/');
+  }
+  onFileSelected(event: Event, messageReponse: Message): void {
+  const input = event.target as HTMLInputElement;
+
+  
+  if (input.files && input.files.length > 0) {
+    const selectedFile = input.files[0];
+    const dateProlongation = messageReponse.entites?.['DATE'] ?? ""; // fallback vide si manquant
+    const apiUrl = messageReponse.texteReponse; 
+    const formData = new FormData();
+    formData.append("dateProlongation", dateProlongation); // date bidon
+    formData.append("fichier", selectedFile);
+    const message = new Message({
+      texteReponse: "✅ prolongation effectuée avce succées.",
+      intention: "prolonger_expiration_dossier",
+      conversation: this.conversationcourante
+    });
+    this.http.put(apiUrl, formData, {
+      headers: {
+        Authorization: `Bearer ${this.tokenStorage.getToken()}`
+      }
+    }).subscribe({
+      next: () =>  {
+        this.ConversationService.addMessage(message).subscribe({
+          next: () => console.log("Réponse enregistrée avec succès."),
+          error: (err) => console.error("Erreur d'enregistrement :", err)
+        });
+        this.conversationcourante.messages.push(message);
+        this.scrollToBottom();},
+      //alert("✅ Prolongation envoyée !"),
+      error: err => alert("❌ Erreur : " + err.error)
+    });
+  }
+}
+
+  
+  // isPdfLink(text: string): boolean {
+  // return text.includes('http://localhost:8085') || text.includes('.pdf');
+  // }
+  isPdfLink(text: string): boolean {
+  // PDF si :
+  return (
+    text.includes('http://localhost:8085') &&
+    !text.includes('/scolarite/prolonger') &&  // <-- exclure lien de prolongation
+    (
+      text.includes('/transferts/') ||
+      text.includes('/dossiersDelegues/DOSS') ||
+      text.includes('/etatDeclaration/consulter') ||
+      text.includes('/RapportMvmntsFinanciers/') ||
+      text.endsWith('.pdf')
+    )
+  );
+  }
+
+
+  sanitizePdfUrl(url: string): void {
+  if (this.pdfBlobUrls.has(url)) return;
+  let fullUrl = url.startsWith('http') ? url : 'http://localhost:8085' + url;
+
+  this.http.get(fullUrl, {
+    responseType: 'blob',
+    headers: {
+      Authorization: `Bearer ${this.tokenStorage.getToken()}`  // remplace avec ton système d'auth
+    }
+  }).subscribe(blob => {
+    const blobUrl = URL.createObjectURL(blob);
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+    this.pdfBlobUrls.set(url, safeUrl);
+    this.cdr.detectChanges();
+  });
+
+  //return null; // temporairement, on n’a pas encore le blob
+  } 
+
+  checkAndLoadPdf(message: Message) {
+  const url = message.texteReponse;
+  if (this.isPdfLink(url) && !this.pdfBlobUrls.has(url)) {
+    this.sanitizePdfUrl(url); // va lancer le chargement async
+  }
+  }
 
 }

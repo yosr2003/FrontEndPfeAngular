@@ -155,7 +155,7 @@ export class AppAssistantVirtuelSideBar {
     formData.append("dateProlongation", dateProlongation); // date bidon
     formData.append("fichier", selectedFile);
     const message = new Message({
-      texteReponse: "✅ Pièce justificative envoyée avec succès.",
+      texteReponse: "✅ prolongation effectuée avce succées.",
       intention: "prolonger_expiration_dossier",
       conversation: this.conversationcourante
     });

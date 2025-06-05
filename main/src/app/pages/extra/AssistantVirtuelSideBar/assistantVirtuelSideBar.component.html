@@ -24,9 +24,8 @@
                 </ng-container>
                 <ng-template #checkProlongation>
                   <ng-container *ngIf="isProlongationLink(message.texteReponse); else textOnly">
-                    <label>📁 Choisir un fichier pour la prolongation :</label>
+                    <label>📁 Choisir un justifiatif pour la prolongation :</label>
                     <input type="file" (change)="onFileSelected($event,message)">
-                  <!-- <a *ngIf="pdfBlobUrls.get(message.texteReponse)"   [href]="pdfBlobUrls.get(message.texteReponse)" target="_blank" rel="noopener">👉 Cliquez ici pour ouvrir le PDF</a> -->
                   </ng-container>
                 </ng-template>
                 <ng-template #textOnly>{{ message.texteReponse }}</ng-template>

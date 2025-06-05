@@ -20,7 +20,19 @@
           <div class="chat-messages">
             <div *ngFor="let message of conversationcourante.messages" >
               <div class="message user" >{{ message.texteMessage }}</div>
-              <div class="message bot" *ngIf="message.texteReponse">{{ message.texteReponse }}</div>
+              <div class="message bot" *ngIf="message.texteReponse">
+                <ng-container *ngIf="isPdfLink(message.texteReponse); else checkProlongation">
+                  <a *ngIf="pdfBlobUrls.get(message.texteReponse)"   [href]="pdfBlobUrls.get(message.texteReponse)" target="_blank" rel="noopener">👉 Cliquez ici pour ouvrir le PDF</a>
+                  <span *ngIf="!pdfBlobUrls.get(message.texteReponse)">📄 ce document n'est pas disponible...</span>
+                </ng-container>
+                <ng-template #checkProlongation>
+                  <ng-container *ngIf="isProlongationLink(message.texteReponse); else textOnly">
+                    <label>📁 Choisir un justifiatif pour la prolongation :</label>
+                    <input type="file" (change)="onFileSelected($event,message)">
+                  </ng-container>
+                </ng-template>
+                <ng-template #textOnly>{{ message.texteReponse }}</ng-template>
+              </div>
             </div>
             
 
