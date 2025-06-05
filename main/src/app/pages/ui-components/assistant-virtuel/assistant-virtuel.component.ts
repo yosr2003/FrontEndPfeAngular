@@ -56,7 +56,10 @@ ngOnInit() {
       this.isOpen = false;
     }
   });
-  this.ConversationService.getAllConversations().pipe(
+  const user = this.tokenStorage.getUser();
+    const userId = user?.id;
+    console.log("ID de l'utilisateur connecté :", userId);
+  this.ConversationService.getConversationsByEmploye(userId).pipe(
     switchMap(data => {
       if (data.length === 0) {
         // Appel ta nouvelle version de createNewConversation()
@@ -115,9 +118,11 @@ ngOnInit() {
 
 
   createNewConversation(): Observable<Conversation>{
-    const employe = new Employe(1, '', '', '', ''); 
+   const user = this.tokenStorage.getUser();
+    const userId = user?.id;
+    console.log("ID de l'utilisateur connecté :", userId);
     const newConversation = new Conversation(
-    employe,
+    user,
     new Date() 
     );
     return this.ConversationService.addConversation(newConversation).pipe(
