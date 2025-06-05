@@ -63,6 +63,7 @@ export class AppSideLoginComponent {
     next: (res) => {
       console.log("Login successful", res);
       this.tokenStorage.saveToken(res.accessToken);
+      this.tokenStorage.saveUser(res);
         if (res.roles && res.roles.length > 0) {
       this.tokenStorage.saveRole(res.roles[0]);
       console.log("res.roles[0]*******************", res.roles[0])
