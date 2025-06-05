@@ -31,12 +31,18 @@
                 <ng-template #textOnly>{{ message.texteReponse }}</ng-template>
               </div>
             </div>
-          <div class="message bot typing-indicator" *ngIf="botTyping">
+          <!-- <div class="message bot typing-indicator" *ngIf="botTyping">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div> -->
+
+        </div>
+        <div class="message bot typing-indicator" *ngIf="botTyping">
             <span class="dot"></span>
             <span class="dot"></span>
             <span class="dot"></span>
           </div>
-        </div>
       </div>
       
       <div class="chat-input">

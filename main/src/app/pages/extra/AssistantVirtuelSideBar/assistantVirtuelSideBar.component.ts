@@ -195,7 +195,7 @@ export class AppAssistantVirtuelSideBar {
     !text.includes('/scolarite/prolonger') &&  // <-- exclure lien de prolongation
     (
       text.includes('/transferts/') ||
-      text.includes('/dossiersDelegues/DOSS') ||
+      text.includes('/dossiersDelegues/DOS') ||
       text.includes('/etatDeclaration/consulter') ||
       text.includes('/RapportMvmntsFinanciers/') ||
       text.endsWith('.pdf')
