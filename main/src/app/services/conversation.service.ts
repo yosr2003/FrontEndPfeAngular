@@ -17,6 +17,13 @@ export class ConversationService {private baseUrl = 'http://localhost:8085';
     });
     return this.http.get<Conversation[]>(`${this.baseUrl}/conversations`,{ headers }).pipe(catchError(this.handleError));
   }
+  getConversationsByEmploye(id:number):Observable<Conversation[]>{
+    const token = this.tokenStorage.getToken(); 
+    const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<Conversation[]>(`${this.baseUrl}/conversations/Employe/${id}`,{ headers }).pipe(catchError(this.handleError));
+  }
   getMessagesByConversation(id:Number):Observable<Message[]>{
     const token = this.tokenStorage.getToken(); 
     const headers = new HttpHeaders({

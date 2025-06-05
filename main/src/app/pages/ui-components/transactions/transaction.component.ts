@@ -53,7 +53,7 @@ displayedColumns: string[] = [
     //   this.Transferts = data;
     // });
     const transfertId = 'TSC792766'; // mets ici un ID existant
-    let url=`http://localhost:8085/etatDeclaration/consulter?typeDeclaration=ACHAT_BIEN&trimestre=T2`;
+    let url=`http://localhost:8085/RapportMvmntsFinanciers/DOSS002`;
     this.http.get(url, {
   headers: { Authorization: `Bearer ${this.tokenStorage.getToken()}` },
   responseType: 'blob',

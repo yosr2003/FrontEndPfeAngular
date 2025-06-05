@@ -150,7 +150,11 @@ ngOnInit() {
   if (!this.newMessage.trim()) return;
 
   const texteMessage = this.newMessage;
-  const message= new Message(new Date(),texteMessage,this.conversationcourante);
+  const message = new Message({
+  texteReponse: texteMessage,
+  conversation: this.conversationcourante
+  });
+  //const message= new Message(new Date(),texteMessage,this.conversationcourante);
   this.conversationcourante.messages.push(message);
 
   this.newMessage = '';

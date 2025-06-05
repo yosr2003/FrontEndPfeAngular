@@ -7,7 +7,7 @@ import { TokenStorageService } from './token-storage-service.service';
   providedIn: 'root'
 })
 export class ChatService {
-  private baseUrl = 'http://localhost:5004'; 
+  private baseUrl = 'http://localhost:5005'; 
   constructor(private http: HttpClient,private tokenStorage: TokenStorageService) { }
   
   sendMessage(messages: Message[]): Observable<Message> {

@@ -29,14 +29,15 @@ export class AppAssistantVirtuelSideBar {
   pdfBlobUrls = new Map<string, SafeResourceUrl>();
   conversations:Conversation[]=[];
   conversationcourante:Conversation;
-  
+  currentProlongationApiUrl: string | null = null;
+  selectedFile: File | null = null;
   
   constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService,private cdr: ChangeDetectorRef) {
   this.conversationcourante = this.conversations[0];}
 
   ngOnInit() {
     this.assistantStateService.openSidebar(); 
-    this.ConversationService.getAllConversations().pipe(
+    this.ConversationService.getConversationsByEmploye(1).pipe(
     switchMap(data => {
       if (data.length === 0) {
         // Appel ta nouvelle version de createNewConversation()
@@ -83,7 +84,11 @@ export class AppAssistantVirtuelSideBar {
   if (!this.newMessage.trim()) return;
 
   const texteMessage = this.newMessage;
-  const message= new Message(new Date(),texteMessage,this.conversationcourante);
+  const message = new Message({
+  texteMessage: texteMessage,
+  conversation: this.conversationcourante
+  });
+  //const message= new Message(new Date(),texteMessage,this.conversationcourante);
   this.conversationcourante.messages.push(message);
 
   this.newMessage = '';
@@ -135,14 +140,64 @@ export class AppAssistantVirtuelSideBar {
       });
   }
   
-  isPdfLink(text: string): boolean {
-  return text.includes('http://localhost:8085') || text.includes('.pdf');
+  isProlongationLink(text: string): boolean {
+  return text.includes('/scolarite/prolonger/');
   }
-  //SafeResourceUrl | null
-  sanitizePdfUrl(url: string): void {
-  // if (this.pdfBlobUrls.has(url)) {
-  //   return this.pdfBlobUrls.get(url)!;
+  onFileSelected(event: Event, messageReponse: Message): void {
+  const input = event.target as HTMLInputElement;
+
+  
+  if (input.files && input.files.length > 0) {
+    const selectedFile = input.files[0];
+    const dateProlongation = messageReponse.entites?.['DATE'] ?? ""; // fallback vide si manquant
+    const apiUrl = messageReponse.texteReponse; 
+    const formData = new FormData();
+    formData.append("dateProlongation", dateProlongation); // date bidon
+    formData.append("fichier", selectedFile);
+    const message = new Message({
+      texteReponse: "✅ Pièce justificative envoyée avec succès.",
+      intention: "prolonger_expiration_dossier",
+      conversation: this.conversationcourante
+    });
+    this.http.put(apiUrl, formData, {
+      headers: {
+        Authorization: `Bearer ${this.tokenStorage.getToken()}`
+      }
+    }).subscribe({
+      next: () =>  {
+        this.ConversationService.addMessage(message).subscribe({
+          next: () => console.log("Réponse enregistrée avec succès."),
+          error: (err) => console.error("Erreur d'enregistrement :", err)
+        });
+        this.conversationcourante.messages.push(message);
+        this.scrollToBottom();},
+      //alert("✅ Prolongation envoyée !"),
+      error: err => alert("❌ Erreur : " + err.error)
+    });
+  }
+}
+
+  
+  // isPdfLink(text: string): boolean {
+  // return text.includes('http://localhost:8085') || text.includes('.pdf');
   // }
+  isPdfLink(text: string): boolean {
+  // PDF si :
+  return (
+    text.includes('http://localhost:8085') &&
+    !text.includes('/scolarite/prolonger') &&  // <-- exclure lien de prolongation
+    (
+      text.includes('/transferts/') ||
+      text.includes('/dossiersDelegues/DOSS') ||
+      text.includes('/etatDeclaration/consulter') ||
+      text.includes('/RapportMvmntsFinanciers/') ||
+      text.endsWith('.pdf')
+    )
+  );
+  }
+
+
+  sanitizePdfUrl(url: string): void {
   if (this.pdfBlobUrls.has(url)) return;
   let fullUrl = url.startsWith('http') ? url : 'http://localhost:8085' + url;
 
