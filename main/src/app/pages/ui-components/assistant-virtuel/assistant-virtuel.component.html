@@ -1,5 +1,22 @@
 <div *ngIf="!isSidebarVisible">
 <div class="chat-widget">
+
+<div 
+  class="chat-bubble" 
+  *ngIf="notificationVisible && !isOpen"
+>
+  <ng-container *ngIf="userRole === 'ROLE_ChargéClientele'; else transfertNotif">
+    ⚠️ {{ echeancesEnAlerte.length }} échéance(s) de remboursement proche(s) à traiter !
+  </ng-container>
+
+  <ng-template #transfertNotif>
+    Vous avez {{ transfertsEnAttenteCount }} transfert(s) en attente 👋
+  </ng-template>
+
+  <span class="mini-notification" (click)="notificationVisible = false">X</span>
+</div>
+
+
     <button mat-fab class="chat-trigger" (click)="toggleChat()">
       <mat-icon>{{ isOpen ? 'close' : 'chat' }}</mat-icon>
       
