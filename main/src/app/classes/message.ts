@@ -23,7 +23,7 @@ export class Message {
   texteMessage: string;
   texteReponse: string;
   intention?: string;
-  entites?: { [key: string]: string };
+  entites?: { [key: string]: string};
   conversation: Conversation;
 
   constructor(data: Partial<Message>) {

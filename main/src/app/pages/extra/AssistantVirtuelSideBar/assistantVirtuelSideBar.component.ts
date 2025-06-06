@@ -26,6 +26,7 @@ export class AppAssistantVirtuelSideBar {
   newMessage = '';
   botTyping = false;
   showHistory = false;
+  idAnalyse:number | undefined;
   pdfBlobUrls = new Map<string, SafeResourceUrl>();
   conversations:Conversation[]=[];
   conversationcourante:Conversation;
@@ -155,39 +156,97 @@ export class AppAssistantVirtuelSideBar {
 
   
   if (input.files && input.files.length > 0) {
-    const selectedFile = input.files[0];
-    const dateProlongation = messageReponse.entites?.['DATE'] ?? ""; // fallback vide si manquant
-    const apiUrl = messageReponse.texteReponse; 
+    this.selectedFile = input.files[0];
+    const dateProlongation = messageReponse.entites?.['DATE'] ?? ""; 
+    
+
     const formData = new FormData();
-    formData.append("dateProlongation", dateProlongation); // date bidon
-    formData.append("fichier", selectedFile);
-    const message = new Message({
-      texteReponse: "✅ prolongation effectuée avce succées.",
-      intention: "prolonger_expiration_dossier",
-      conversation: this.conversationcourante
-    });
-    this.http.put(apiUrl, formData, {
-      headers: {
-        Authorization: `Bearer ${this.tokenStorage.getToken()}`
-      }
-    }).subscribe({
-      next: () =>  {
-        this.ConversationService.addMessage(message).subscribe({
-          next: () => console.log("Réponse enregistrée avec succès."),
-          error: (err) => console.error("Erreur d'enregistrement :", err)
+    formData.append("file", this.selectedFile);
+    this.botTyping = true;
+    this.http.post<any>("http://127.0.0.1:8010/analyze-pdf/", formData).subscribe({
+      next: (response: any) => {
+        this.botTyping = false;
+        console.log("Réponse de l'analyse :", response);
+        // Supprimer les anciens messages d'analyse liés à ce message source (optionnel mais propre)
+        this.conversationcourante.messages = this.conversationcourante.messages.filter(m =>
+        !(m.intention === 'analyse_justificatif' && m.id_message === this.idAnalyse)
+        );
+        const analyseMessage = new Message({
+          texteReponse: `📄 Justificatif analysé :\n📅 Date détectée : ${response.contient_date ? '✅ Oui' : '❌ Non'}\n🧠 Score grammaire : ${response.score_grammaire}%\n🏷️ Pertinence du motif : ${response.classification.label}\n✍️ Signature détectée : ${response.signature_detectee ? '✅ Oui' : '❌ Non'}`,
+          intention: "analyse_justificatif",
+          entites: {
+            ...messageReponse.entites,
+            urlProlongation: messageReponse.texteReponse,
+            dateProlongation: dateProlongation,
+          },
+          conversation: this.conversationcourante
         });
-        this.conversationcourante.messages.push(message);
-        this.scrollToBottom();},
-      //alert("✅ Prolongation envoyée !"),
-      error: err => alert("❌ Erreur : " + err.error)
-    });
-  }
+        this.idAnalyse=analyseMessage.id_message;
+        console.log("msg", analyseMessage);
+        
+        
+
+        this.conversationcourante.messages.push(analyseMessage);
+         this.scrollToBottom();
+        
+      },
+      error: (err) => {
+        this.botTyping = false;
+        const successMessage = new Message({
+        texteReponse: "IL y'a eu une rreur d'analyse du justificatif",
+        conversation: this.conversationcourante
+      });
+       
+      this.ConversationService.addMessage(successMessage).subscribe();
+      this.conversationcourante.messages.push(successMessage);
+      this.scrollToBottom();
+      console.error("Erreur d'analyse du justificatif :", err);
+      }
+      });
+    // const analyseMessage = new Message({
+    //   texteReponse: "📄 Justificatif analysé : tout semble correct (test).",
+    //   intention: "analyse_justificatif",
+    //   entites: {
+    //     ...messageReponse.entites,
+    //     urlProlongation: messageReponse.texteReponse,
+    //     dateProlongation: dateProlongation
+    //   },
+    //   conversation: this.conversationcourante
+    // });
+
+    // this.conversationcourante.messages.push(analyseMessage);
+    // this.scrollToBottom();
+    
+    // fallback vide si manquant
+  //   const apiUrl = messageReponse.texteReponse; 
+  //   const formData = new FormData();
+  //   formData.append("dateProlongation", dateProlongation); // date bidon
+  //   formData.append("fichier", selectedFile);
+  //   const message = new Message({
+  //     texteReponse: "✅ prolongation effectuée avce succées.",
+  //     intention: "prolonger_expiration_dossier",
+  //     conversation: this.conversationcourante
+  //   });
+  //   this.http.put(apiUrl, formData, {
+  //     headers: {
+  //       Authorization: `Bearer ${this.tokenStorage.getToken()}`
+  //     }
+  //   }).subscribe({
+  //     next: () =>  {
+  //       this.ConversationService.addMessage(message).subscribe({
+  //         next: () => console.log("Réponse enregistrée avec succès."),
+  //         error: (err) => console.error("Erreur d'enregistrement :", err)
+  //       });
+  //       this.conversationcourante.messages.push(message);
+  //       this.scrollToBottom();},
+  //     //alert("✅ Prolongation envoyée !"),
+  //     error: err => alert("❌ Erreur : " + err.error)
+  //   });
+   }
 }
 
   
-  // isPdfLink(text: string): boolean {
-  // return text.includes('http://localhost:8085') || text.includes('.pdf');
-  // }
+
   isPdfLink(text: string): boolean {
   // PDF si :
   return (
@@ -230,23 +289,40 @@ export class AppAssistantVirtuelSideBar {
   }
   }
 
+  prolongerDepuisAnalyse(messageAnalyse: Message): void {
+    const fichier = this.selectedFile;
+    const apiUrl = messageAnalyse.entites?.['urlProlongation'];
+    if(!fichier || !apiUrl){
+      console.error("Aucun fichier trouvé dans le message pour la prolongation.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("dateProlongation", messageAnalyse.entites?.['DATE'] ?? "");
+    formData.append("fichier", fichier);
+    
+    const successMessage = new Message({
+    texteReponse: "✅ Prolongation effectuée avec succès.",
+    intention: "prolonger_expiration_dossier",
+    conversation: this.conversationcourante
+    });
+    this.http.put(apiUrl, formData, {
+    headers: {
+      Authorization: `Bearer ${this.tokenStorage.getToken()}`
+    }
+    }).subscribe({
+    next: () => {
+      this.ConversationService.addMessage(successMessage).subscribe();
+      this.conversationcourante.messages.push(successMessage);
+      this.scrollToBottom();
+    },
+    error: err => alert("❌ Erreur : " + err.error)
+  });
+}
 
  
 
 
  
- 
-  //  toggleChat() {
-  //   this.isOpen = !this.isOpen;
-  //   if (this.isOpen) {
-  //     this.hasNotification = false;
-  //     this.showBubble = false;
-  //     this.showHistory = false;
-  //   }
-  // }
 
-  // toggleHistory() {
-  //   this.showHistory = !this.showHistory;
-  // }
   
 }

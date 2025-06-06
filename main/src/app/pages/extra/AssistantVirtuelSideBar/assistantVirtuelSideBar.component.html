@@ -12,10 +12,6 @@
             <div class="message user" *ngIf="message.texteMessage">
               <div class="bubble">{{ message.texteMessage }}</div>
             </div>
-            <!-- <div class="message bot" *ngIf="message.texteReponse">
-              <div class="bubble">{{ message.texteReponse }}</div>
-            </div> -->
-              <!-- Message bot -->
             <div class="message bot" *ngIf="message.texteReponse" [ngClass]="{ 'pdf-message': isPdfLink(message.texteReponse) }">
               <div class="bubble">
                 <ng-container *ngIf="isPdfLink(message.texteReponse); else checkProlongation">
@@ -23,21 +19,25 @@
                   <span *ngIf="!pdfBlobUrls.get(message.texteReponse)">📄 ce document n'est pas disponible...</span>
                 </ng-container>
                 <ng-template #checkProlongation>
-                  <ng-container *ngIf="isProlongationLink(message.texteReponse); else textOnly">
-                    <label>📁 Choisir un justifiatif pour la prolongation :</label>
-                    <input type="file" (change)="onFileSelected($event,message)">
+                  <ng-container *ngIf="isProlongationLink(message.texteReponse); else textOnly" class="upload-wrapper">
+                    <label class="upload-label">📁 Choisir un justifiatif pour la prolongation :
+                    <input type="file" (change)="onFileSelected($event,message)" hidden>
+                    </label>
                   </ng-container>
                 </ng-template>
-                <ng-template #textOnly>{{ message.texteReponse }}</ng-template>
+                <ng-template #textOnly>
+                  
+                  <div [innerText]="message.texteReponse"></div>
+                  
+                  <div *ngIf="message.intention === 'analyse_justificatif'">
+                    <button class="prolongation-btn"  (click)="prolongerDepuisAnalyse(message)"><span style="margin-right: 8px;">✅</span> Procéder à la prolongation</button>
+                  </div>
+                  
+                </ng-template>
               </div>
             </div>
-          <!-- <div class="message bot typing-indicator" *ngIf="botTyping">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-          </div> -->
-
         </div>
+        
         <div class="message bot typing-indicator" *ngIf="botTyping">
             <span class="dot"></span>
             <span class="dot"></span>
