@@ -11,16 +11,23 @@
       <h2>Connexion à GTI Financière</h2>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <mat-form-field class="custom-field" appearance="outline">
+          <mat-form-field class="custom-field" appearance="outline">
           <input matInput placeholder="Adresse e-mail" type="email" formControlName="uname" />
+          <mat-error *ngIf="f['uname'].hasError('required')">Email requis</mat-error>
+          <mat-error *ngIf="f['uname'].hasError('email')">Email invalide</mat-error>
         </mat-form-field>
+
+ 
 
         <mat-form-field class="custom-field" appearance="outline">
-          <input matInput placeholder="Mot de passe" type="password" formControlName="password" />
+          <input matInput placeholder="Mot de passe" type="password" formControlName="password"  />
+            <mat-error *ngIf="f['password'].hasError('required')">mot de passe requis</mat-error>
+          <mat-error *ngIf="f['password'].hasError('email')">mot de passe invalide</mat-error>
         </mat-form-field>
-
+      
         <button mat-flat-button color="primary" class="login-button" [disabled]="form.invalid">Connexion</button>
         <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+         <div *ngIf="authError" class="error-message">{{ authError }}</div>
       </form>
     </div>
 

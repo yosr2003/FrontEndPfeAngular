@@ -193,7 +193,7 @@ export class AppAssistantVirtuelSideBar {
       error: (err) => {
         this.botTyping = false;
         const successMessage = new Message({
-        texteReponse: "IL y'a eu une rreur d'analyse du justificatif",
+        texteReponse: "IL y'a eu une erreur d'analyse du justificatif",
         conversation: this.conversationcourante
       });
        
