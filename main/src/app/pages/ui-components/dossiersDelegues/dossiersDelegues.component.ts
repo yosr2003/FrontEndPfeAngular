@@ -7,15 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { DossierDelegueService } from 'src/app/services/dossier-delegue.service';
-import { Transfert } from 'src/app/classes/transfert';
 import { DossierDelegue } from 'src/app/classes/dossier-delegue';
-
 
 @Component({
   selector: 'app-tables',
+  standalone: true,
   imports: [
-    MatTableModule,
     CommonModule,
+    MatTableModule,
     MatCardModule,
     MaterialModule,
     MatIconModule,
@@ -30,28 +29,21 @@ export class AppDossiersDeleguesComponent implements OnInit {
     'idDossier',
     'dateDebut',
     'dateExpiration',
-    'etatDoss',
+    'etatDossier',
     'dateCre',
-    'dateClo',
-    'motifClo',
-    'motifProlong',
-    'typeDoss',
-    'rapportMouvement',
-    'actions'
+    'dateCloture',
+    'motifcloture',
+
   ];
+
   DossiersDelegues: DossierDelegue[] = [];
-  constructor(private DossierDelegueService: DossierDelegueService) {
-}
+
+  constructor(private DossierDelegueService: DossierDelegueService) {}
+
   ngOnInit() {
-  
-    this.DossierDelegueService.getAllDossiers().subscribe(response => {
-      console.log('Dossiers reçus depuis le backend:', response);
-      this.DossiersDelegues = response.body;
+    this.DossierDelegueService.getAllDossiers().subscribe((dossiers) => {
+      console.log('Dossiers reçus depuis le backend:', dossiers);
+      this.DossiersDelegues = dossiers;
     });
-    
-
-    
-
-  
-}
+  }
 }

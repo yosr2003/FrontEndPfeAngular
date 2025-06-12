@@ -1,10 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
-import { TablerIconsModule } from 'angular-tabler-icons';
-import { MaterialModule } from 'src/app/material.module';
-
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 import {
   ApexChart,
-  ChartComponent,
   ApexDataLabels,
   ApexLegend,
   ApexStroke,
@@ -17,16 +14,23 @@ import {
   ApexFill,
   ApexMarkers,
   ApexResponsive,
-  NgApexchartsModule,
 } from 'ng-apexcharts';
-import { MatButtonModule } from '@angular/material/button';
 
-interface month {
-  value: string;
-  viewValue: string;
+import { DossierDelegueService } from 'src/app/services/dossier-delegue.service';
+import { DossierDelegue } from 'src/app/classes/dossier-delegue';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatOptionModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+
+interface Month {
+  value: string; // format "MM-YYYY"
+  viewValue: string; // format "Juin 2025"
 }
 
-export interface salesOverviewChart {
+export interface SalesOverviewChart {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   dataLabels: ApexDataLabels;
@@ -38,80 +42,112 @@ export interface salesOverviewChart {
   stroke: ApexStroke;
   legend: ApexLegend;
   grid: ApexGrid;
-  marker: ApexMarkers;
+  markers: ApexMarkers;
+  responsive: ApexResponsive[];
+  colors: string[];
 }
 
 @Component({
   selector: 'app-sales-overview',
-  imports: [MaterialModule, TablerIconsModule, NgApexchartsModule, MatButtonModule],
+  standalone: true,
   templateUrl: './sales-overview.component.html',
+  imports: [
+    NgApexchartsModule,
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatOptionModule,
+  ],
 })
-export class AppSalesOverviewComponent {
+export class AppSalesOverviewComponent implements OnInit {
+  @ViewChild('chart') chart!: ChartComponent;
 
-  @ViewChild('chart') chart: ChartComponent = Object.create(null);
+  public salesOverviewChart: SalesOverviewChart = {
+    series: [],
+    chart: {
+      type: 'bar',
+      height: 390,
+      offsetX: 0,
+      toolbar: { show: false },
+      foreColor: '#adb0bb',
+      fontFamily: 'inherit',
+      sparkline: { enabled: false },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '35%',
+        borderRadius: 4,
+      },
+    },
+    dataLabels: { enabled: false },
+    xaxis: {
+      type: 'category',
+      categories: [],
+      labels: { style: { cssClass: '' } },
+    },
+    yaxis: {
+      show: true,
+      min: 0,
+      tickAmount: 4,
+      labels: { style: { cssClass: '' } },
+    },
+    fill: { type: 'solid' },
+    tooltip: { theme: 'light' },
+    stroke: {
+      show: true,
+      width: 3,
+      lineCap: 'butt',
+      colors: ['#5D87FF'],
+    },
+    legend: { show: false },
+    grid: {
+      borderColor: '#e0e0e0',
+      strokeDashArray: 3,
+      xaxis: { lines: { show: false } },
+    },
+    markers: { size: 0 },
+    responsive: [],
+    colors: ['#5D87FF'],
+  };
 
-  public salesOverviewChart!: Partial<salesOverviewChart> | any;
+  months: Month[] = [];
+  selectedMonth: string = '';
 
-  months: month[] = [
-    { value: 'mar', viewValue: 'Sep 2025' },
-    { value: 'apr', viewValue: 'Oct 2025' },
-    { value: 'june', viewValue: 'Nov 2025' },
-  ];
+  constructor(private dossierService: DossierDelegueService) {}
 
+  ngOnInit(): void {
+    this.dossierService.getAllDossiers().subscribe((dossiers: DossierDelegue[]) => {
+      this.generateAvailableMonths(dossiers);
+      this.selectedMonth = this.months[this.months.length - 1]?.value || '';
+      this.updateChart(dossiers);
+    });
+  }
 
-  constructor() {
+  onMonthChange(newMonth: string): void {
+    this.selectedMonth = newMonth;
+    this.dossierService.getAllDossiers().subscribe((dossiers) => {
+      this.updateChart(dossiers);
+    });
+  }
 
-    // sales overview chart
+  private updateChart(dossiers: DossierDelegue[]): void {
+    const filtered = dossiers.filter(d =>
+      this.getMonthKey(new Date(d.dateCre)) === this.selectedMonth
+    );
+
+    const counts = this.countDossierTypes(filtered);
+    const labels = Object.keys(counts);
+    const values = Object.values(counts);
+
     this.salesOverviewChart = {
-      series: [
-        {
-          name: 'Eanings this month',
-          data: [355, 390, 300, 350, 390, 180, 355, 390],
-          color: '#5D87FF',
-        },
-        {
-          name: 'Expense this month',
-          data: [280, 250, 325, 215, 250, 310, 280, 250],
-          color: '#49BEFF',
-        },
-      ],
-
-      grid: {
-        borderColor: 'rgba(0,0,0,0.1)',
-        strokeDashArray: 3,
-        xaxis: {
-          lines: {
-            show: false,
-          },
-        },
-      },
-      plotOptions: {
-        bar: { horizontal: false, columnWidth: '35%', borderRadius: [4] },
-      },
-      chart: {
-        type: 'bar',
-        height: 390,
-        offsetX: -15,
-        toolbar: { show: false },
-        foreColor: '#adb0bb',
-        fontFamily: 'inherit',
-        sparkline: { enabled: false },
-      },
-      dataLabels: { enabled: false },
-      markers: { size: 0 },
-      legend: { show: false },
+      ...this.salesOverviewChart,
+      series: [{ name: 'Nombre de dossiers', data: values }],
       xaxis: {
         type: 'category',
-        categories: [
-          '16/08',
-          '17/08',
-          '18/08',
-          '19/08',
-          '20/08',
-          '21/08',
-          '22/08',
-          '23/08',
-        ],
+        categories: labels,
         labels: {
           style: { cssClass: 'grey--text lighten-2--text fill-color' },
         },
@@ -119,35 +155,62 @@ export class AppSalesOverviewComponent {
       yaxis: {
         show: true,
         min: 0,
-        max: 400,
         tickAmount: 4,
         labels: {
-          style: {
-            cssClass: 'grey--text lighten-2--text fill-color',
-          },
+          style: { cssClass: 'grey--text lighten-2--text fill-color' },
         },
       },
-      stroke: {
-        show: true,
-        width: 3,
-        lineCap: 'butt',
-        colors: ['transparent'],
-      },
-      tooltip: { theme: 'light' },
+    };
+  }
 
-      responsive: [
-        {
-          breakpoint: 600,
-          options: {
-            plotOptions: {
-              bar: {
-                borderRadius: 3,
-              },
-            },
-          },
-        },
-      ],
+  private generateAvailableMonths(dossiers: DossierDelegue[]): void {
+    const monthMap = new Map<string, string>();
+    const monthNames = [
+      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+    ];
+
+    dossiers.forEach(d => {
+      const date = new Date(d.dateCre);
+      const key = this.getMonthKey(date);
+      const label = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+      monthMap.set(key, label);
+    });
+
+    // Tri des mois (du plus ancien au plus récent)
+    this.months = Array.from(monthMap.entries())
+      .sort((a, b) => {
+        const [ma, ya] = a[0].split('-').map(Number);
+        const [mb, yb] = b[0].split('-').map(Number);
+        return ya === yb ? ma - mb : ya - yb;
+      })
+      .map(([value, viewValue]) => ({ value, viewValue }));
+  }
+
+  private getMonthKey(date: Date): string {
+    return `${date.getMonth()}-${date.getFullYear()}`; 
+  }
+
+  private countDossierTypes(dossiers: DossierDelegue[]): { [key: string]: number } {
+    const counts: { [key: string]: number } = {};
+
+    const typeMap: { [key: string]: string } = {
+      DossierScolarite: 'Scolarité',
+      DossierEmpreint: 'Emprunt extérieur',
+      DossierEconomieSurSalaire: 'Économie sur salaire',
+      DossierContratCommercial: 'Contrat commercial',
+      DossierFormationProfessionnelle: 'Formation personnelle',
+      DossierInvestissement: 'Investissement',
+      DossierSoinMedical: 'Soin médical',
+      DossierDelegue: 'Autre',
     };
 
+    dossiers.forEach((dossier) => {
+      const type = dossier.constructor.name;
+      const readableType = typeMap[type] || type;
+      counts[readableType] = (counts[readableType] || 0) + 1;
+    });
+
+    return counts;
   }
 }

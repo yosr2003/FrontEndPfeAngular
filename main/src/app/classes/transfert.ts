@@ -6,12 +6,10 @@ import { TypeFrais } from "./type-frais";
 
 export class Transfert {
      refTransfert: string;
-        etat: EtatTransfert;
-        natureOperation: string;
+        etatTransfert: EtatTransfert;
         montantTransfert:number;
-        natureTransfert:NatureTransfert;
         montantFinal:number;
-        frais:number;
+        montantFrais:number;
         datecre:Date;
         dateEnvoie:Date;
         typeTransfert:TransfertType;
@@ -22,9 +20,7 @@ export class Transfert {
     
         constructor( refTransfert: string,
             etat: EtatTransfert,
-            natureOperation: string,
             montantTransfert:number,
-            natureTransfert:NatureTransfert,
             montantFinal:number,
             frais:number,
             datecre:Date,
@@ -34,12 +30,10 @@ export class Transfert {
             compteSource: string,
             compteCible: string) {
                 this.refTransfert=refTransfert;
-            this.etat = etat;
-            this.natureOperation = natureOperation;
+            this.etatTransfert = etat;
             this.montantTransfert = montantTransfert;
-            this.natureTransfert = natureTransfert;
             this.montantFinal = montantFinal;
-            this.frais = frais;
+            this.typeFrais = frais;
             this.datecre = datecre;
             this.dateEnvoie = dateEnvoie;
             this.typeTransfert = typeTransfert;

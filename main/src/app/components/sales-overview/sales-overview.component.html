@@ -1,22 +1,35 @@
 <mat-card class="cardWithShadow">
-    <mat-card-content>
-        <div class="d-flex w-100">
-            <mat-card-title>Sales Overview</mat-card-title>
-            <div class="m-l-auto">
-                <mat-form-field class="theme-select" appearance="outline">
-                    <mat-select value="mar">
-                        @for(month of months; track month.viewValue ) {
-                        <mat-option [value]="month.value">
-                            {{ month.viewValue }}
-                        </mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </div>
-        <apx-chart [series]="salesOverviewChart.series" [dataLabels]="salesOverviewChart.dataLabels"
-            [chart]="salesOverviewChart.chart" [legend]="salesOverviewChart.legend" [xaxis]="salesOverviewChart.xaxis"
-            [yaxis]="salesOverviewChart.yaxis" [grid]="salesOverviewChart.grid" [stroke]="salesOverviewChart.stroke"
-            [tooltip]="salesOverviewChart.tooltip" [plotOptions]="salesOverviewChart.plotOptions"></apx-chart>
-    </mat-card-content>
+  <mat-card-content>
+    <div class="d-flex w-100">
+      <mat-card-title>Vue d'ensemble des dossiers</mat-card-title>
+      <div class="m-l-auto">
+        <mat-form-field class="theme-select" appearance="outline">
+          <mat-label>Mois</mat-label>
+          <mat-select [(value)]="selectedMonth" (selectionChange)="onMonthChange($event.value)">
+            <mat-option *ngFor="let month of months" [value]="month.value">
+              {{ month.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Ne montre le graphique que si series existe -->
+    <apx-chart
+      *ngIf="salesOverviewChart.series?.length"
+      [series]="salesOverviewChart.series"
+      [dataLabels]="salesOverviewChart.dataLabels"
+      [chart]="salesOverviewChart.chart"
+      [legend]="salesOverviewChart.legend"
+      [xaxis]="salesOverviewChart.xaxis"
+      [yaxis]="salesOverviewChart.yaxis"
+      [grid]="salesOverviewChart.grid"
+      [stroke]="salesOverviewChart.stroke"
+      [tooltip]="salesOverviewChart.tooltip"
+      [plotOptions]="salesOverviewChart.plotOptions"
+      [fill]="salesOverviewChart.fill"
+      [markers]="salesOverviewChart.markers"
+      [responsive]="salesOverviewChart.responsive"
+    ></apx-chart>
+  </mat-card-content>
 </mat-card>

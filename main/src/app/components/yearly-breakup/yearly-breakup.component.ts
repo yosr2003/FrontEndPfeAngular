@@ -1,101 +1,146 @@
-import { Component, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import {
-    ApexChart,
-    ChartComponent,
-    ApexDataLabels,
-    ApexLegend,
-    ApexStroke,
-    ApexTooltip,
-    ApexAxisChartSeries,
-    ApexXAxis,
-    ApexYAxis,
-    ApexGrid,
-    ApexPlotOptions,
-    ApexFill,
-    ApexMarkers,
-    ApexResponsive,
-    NgApexchartsModule,
+  ApexChart,
+  ApexDataLabels,
+  ApexLegend,
+  ApexStroke,
+  ApexTooltip,
+  ApexPlotOptions,
+  ApexResponsive,
+  ApexNonAxisChartSeries,
+  NgApexchartsModule,
+  ChartComponent
 } from 'ng-apexcharts';
-import { MaterialModule } from 'src/app/material.module';
 
+import { MaterialModule } from 'src/app/material.module';
+import { DossierDelegueService } from 'src/app/services/dossier-delegue.service';
+import { DossierDelegue } from 'src/app/classes/dossier-delegue';
+import { EtatDoss } from 'src/app/classes/etat-doss';
 
 export interface yearlyChart {
-    series: ApexAxisChartSeries;
-    chart: ApexChart;
-    dataLabels: ApexDataLabels;
-    plotOptions: ApexPlotOptions;
-    tooltip: ApexTooltip;
-    stroke: ApexStroke;
-    legend: ApexLegend;
-    responsive: ApexResponsive;
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  dataLabels: ApexDataLabels;
+  plotOptions: ApexPlotOptions;
+  tooltip: ApexTooltip;
+  stroke: ApexStroke;
+  legend: ApexLegend;
+  responsive: ApexResponsive[];
+  colors: string[];
+  labels: string[];
 }
 
-
-
 @Component({
-    selector: 'app-yearly-breakup',
-    templateUrl: './yearly-breakup.component.html',
-    imports: [MaterialModule, NgApexchartsModule, TablerIconsModule],
-    encapsulation: ViewEncapsulation.None,
+  selector: 'app-yearly-breakup',
+  templateUrl: './yearly-breakup.component.html',
+  standalone: true,
+  imports: [MaterialModule, NgApexchartsModule, TablerIconsModule],
+  encapsulation: ViewEncapsulation.None,
 })
-export class AppYearlyBreakupComponent {
-    @ViewChild('chart') chart: ChartComponent = Object.create(null);
+export class AppYearlyBreakupComponent implements OnInit {
+  @ViewChild('chart') chart!: ChartComponent;
 
-    public yearlyChart!: Partial<yearlyChart> | any;
+  public statusChart: yearlyChart | null = null;
 
+  public totalDossiers2025 = 0;
+  public pourcentageClotures = 0;
+  public pourcentageEnCours = 0;
+  public variationCloture = 0;
 
-    constructor() {
+  constructor(private dossierService: DossierDelegueService) {}
 
-        this.yearlyChart = {
+  ngOnInit(): void {
+    this.loadDossierStatus();
+  }
 
-            color: "#adb5bd",
-            series: [38, 40, 25],
-            labels: ["2025", "2024", "2023"],
-            chart: {
-                width: 125,
-                type: "donut",
-                fontFamily: "inherit",
-                foreColor: "#adb0bb",
+  loadDossierStatus(): void {
+    this.dossierService.getAllDossiers().subscribe((dossiers: DossierDelegue[]) => {
+      const currentYear = new Date().getFullYear();
+
+      const dossiers2025 = dossiers.filter(d => new Date(d.dateCre).getFullYear() === currentYear);
+      const dossiers2024 = dossiers.filter(d => new Date(d.dateCre).getFullYear() === currentYear - 1);
+
+      const clotures2025 = dossiers2025.filter(d => d.dateCloture != null).length;
+      const clotures2024 = dossiers2024.filter(d => d.dateCloture != null).length;
+
+      this.totalDossiers2025 = dossiers2025.length;
+
+      this.pourcentageClotures = this.totalDossiers2025 > 0
+        ? Math.round((clotures2025 / this.totalDossiers2025) * 100)
+        : 0;
+
+      this.pourcentageEnCours = 100 - this.pourcentageClotures;
+
+      this.variationCloture = clotures2024 === 0
+        ? 100
+        : Math.round(((clotures2025 - clotures2024) / clotures2024) * 100);
+
+      const etats = Object.values(EtatDoss);
+      const counts: Record<string, number> = {};
+
+      etats.forEach(etat => counts[etat] = 0);
+
+      dossiers2025.forEach(d => {
+        const etat = d.etatDossier as EtatDoss;
+        if (etat in counts) {
+          counts[etat]++;
+        }
+      });
+
+      const labels = Object.keys(counts);
+      const total = dossiers2025.length || 1;
+      const series = labels.map(label => Math.round((counts[label] / total) * 100));
+
+      this.statusChart = {
+        series,
+        labels,
+        chart: {
+          width: 125,
+          type: 'donut',
+          fontFamily: 'inherit',
+          foreColor: '#adb0bb',
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '75%',
+              labels: {
+                show: true,
+                total: {
+                  show: true,
+                  label: 'Total',
+                  formatter: () => `${this.totalDossiers2025}`
+                }
+              }
             },
-            plotOptions: {
-                pie: {
-                    startAngle: 0,
-                    endAngle: 360,
-                    donut: {
-                        size: "75%",
-                    },
-                },
+          },
+        },
+        stroke: {
+          show: false,
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        legend: {
+          show: false,
+        },
+        colors: ['#13DEB9', '#FFAE1F', '#5D87FF', '#FF4C51', '#A461D8', '#00C292'],
+        tooltip: {
+          theme: 'dark',
+          fillSeriesColor: false,
+        },
+        responsive: [
+          {
+            breakpoint: 991,
+            options: {
+              chart: {
+                width: 120,
+              },
             },
-            stroke: {
-                show: false,
-            },
-
-            dataLabels: {
-                enabled: false,
-            },
-
-            legend: {
-                show: false,
-            },
-            colors: ['#5D87FF', '#ECF2FF', '#F9F9FD'],
-
-            responsive: [
-                {
-                    breakpoint: 991,
-                    options: {
-                        chart: {
-                            width: 120,
-                        },
-                    },
-                },
-            ],
-            tooltip: {
-                theme: "dark",
-                fillSeriesColor: false,
-            },
-        };
-
-
-    }
+          },
+        ],
+      };
+    });
+  }
 }

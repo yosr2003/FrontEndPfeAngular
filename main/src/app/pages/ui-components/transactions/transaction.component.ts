@@ -29,32 +29,32 @@ import { TokenStorageService } from 'src/app/services/token-storage-service.serv
 export class AppTransactionComponent {
   pdfUrl: SafeResourceUrl | null = null;
 displayedColumns: string[] = [
-   'refTransfert',
-           'etat',
-           'natureOperation',
+          'refTransfert',
+           'etatTransfert',
            'montantTransfert',
-           'natureTransfert',
+    
            'montantFinal',
            'frais',
            'datecre',
            'dateEnvoie',
-           'typeTransfert',
            'typeFrais',
            'compteSource',
            'compteCible'
-  ];
+  ];  
+  url=`http://localhost:8085/RapportMvmntsFinanciers/DOSS002`;
   Transferts!: Transfert[];
   constructor(private TransfertService: TransfertService,private sanitizer: DomSanitizer,private http: HttpClient,private tokenStorage: TokenStorageService) {
 }
   ngOnInit() {
   
-    // this.TransfertService.getAllTransferts().subscribe(data => {
-    //   console.log('transferts reçus depuis le backend:', data);
-    //   this.Transferts = data;
-    // });
-    const transfertId = 'TSC792766'; // mets ici un ID existant
-    let url=`http://localhost:8085/RapportMvmntsFinanciers/DOSS002`;
-    this.http.get(url, {
+    this.TransfertService.getAllTransferts().subscribe(data => {
+      console.log('transferts reçus depuis le backend:', data);
+      this.Transferts = data;
+    });
+
+
+    
+    this.http.get(this.url, {
   headers: { Authorization: `Bearer ${this.tokenStorage.getToken()}` },
   responseType: 'blob',
   observe: 'response'
