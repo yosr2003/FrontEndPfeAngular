@@ -122,7 +122,6 @@ export class AppAssistantVirtuelSideBar {
   });
   }
   createNewConversation(): Observable<Conversation>{
-      // const employe = new Employe(1, '', '', '', ''); 
     const user = this.tokenStorage.getUser();
     const userId = user?.id;
     console.log("ID de l'utilisateur connecté :", userId);
@@ -134,7 +133,7 @@ export class AppAssistantVirtuelSideBar {
       tap(createdConversation => {
         console.log("Conversation créée :", createdConversation);
         this.conversations.unshift(createdConversation);
-        this.selectConversation(createdConversation); // Optionnel : sélectionne direct
+        this.selectConversation(createdConversation); 
       })
     );
     }
