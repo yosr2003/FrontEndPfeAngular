@@ -18,6 +18,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TokenStorageService } from 'src/app/services/token-storage-service.service';
 import { AlertesService } from 'src/app/services/alertes.service';
 import { AmortissementEcheance } from 'src/app/classes/AmortissementEcheance';
+import { Transfert } from 'src/app/classes/transfert';
 
 
 @Component({
@@ -45,10 +46,11 @@ export class AssistantVirtuelComponent {
   transfertsEnAttenteCount: number = 0;
   userRole: string = '';
   echeancesEnAlerte: AmortissementEcheance[] = [];
+  showTransfertsPopup = false;
+  transfertsEnAttente: Transfert[] = [];
+  showEcheancesPopup: boolean = false;
 
-
-
-// dans assistant-virtuel.component.ts
+   
 constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private cdr: ChangeDetectorRef,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService,
  private alertesService: AlertesService
 
@@ -63,7 +65,6 @@ constructor(private assistantStateService: AssistantStateService, private http: 
 ngOnInit() {
   this.assistantStateService.sidebarOpen$.subscribe(open => {
     this.isSidebarVisible = open;
-    // BONUS : refermer la petite fenêtre automatiquement si la grande est ouverte
     if (open) {
       this.isOpen = false;
     }
@@ -73,7 +74,6 @@ const role = this.tokenStorage.getRole();
   if (role === 'ROLE_ChargéClientele') {
     this.userRole=role;
     this.alertesService.getAlertesEcheances().subscribe(data => {
-       console.log("echeaaaance", data )
       if (data.length > 0) {
         this.echeancesEnAlerte = data;
         this.notificationVisible = true;
@@ -124,17 +124,33 @@ const role = this.tokenStorage.getRole();
   });
 
 }
+
+// -----------pop up transfert-----------
+openTransfertsPopup() {
+  this.alertesService.getTransfertsEnAttente().subscribe(data => {
+    this.transfertsEnAttente = data;
+    this.showTransfertsPopup = true;
+  });
+}
+
+// ----------pop up echeance------------------
+  openEcheancesPopup() {
+    this.showEcheancesPopup = true;
+  }
+
+  // Optionnel : méthode pour la fermer
+  closeEcheancesPopup() {
+    this.showEcheancesPopup = false;
+  }
+// -----------------------
+
+
   scrollToBottom() {
   const chatMessages = document.querySelector('.chat-messages');
   if (chatMessages) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
   }
-
-
-  // ngOnDestroy() {
-  //   this.sidebarSubscription.unsubscribe();
-  // }
 
   toggleChat() {
     this.isOpen = !this.isOpen;

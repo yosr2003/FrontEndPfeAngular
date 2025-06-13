@@ -316,4 +316,159 @@ body {
 .mini-notification:hover {
   color: #ffcccc; /* optionnel : effet au survol */
 }
+  //  -------------scss de pop up ----------------------
 
+  /* Overlay sombre flouté */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Contenu popup élégant */
+.popup-content-elegant {
+  background: linear-gradient(145deg, #ffffff, #f3f7f9);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', sans-serif;
+  animation: fadeIn 0.3s ease-out;
+  text-align: center;
+}
+
+/* Animation d’apparition */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Titre */
+.popup-content-elegant h3 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Tableau */
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.modern-table th,
+.modern-table td {
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.modern-table thead th {
+  background-color: #e0eafc;
+  color: #444;
+  border-bottom: 2px solid #b6ccf0;
+  border-radius: 8px 8px 0 0;
+}
+
+.modern-table tbody tr {
+  background-color: #f9fbff;
+  transition: background 0.2s ease;
+  border-radius: 8px;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #edf2ff;
+}
+
+.modern-table td {
+  border-bottom: 1px solid #e0eafc;
+}
+
+/* Étiquettes d'état */
+.etat-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+.etat-done {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+.etat-other {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+/* Message Aucun transfert */
+.no-transfert-msg {
+  font-style: italic;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+/* Bouton */
+.elegant-button {
+  background: #4a90e2;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.elegant-button:hover {
+  background: #357ab8;
+}
+
+// -----status echeance
+
+/* Status échéance */
+.status-valid {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+}
+
+.status-traited {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-weight: 600;
+}

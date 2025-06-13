@@ -12,7 +12,6 @@ export class Transfert {
         montantFrais:number;
         datecre:Date;
         dateEnvoie:Date;
-        typeTransfert:TransfertType;
         typeFrais:TypeFrais;
         compteSource: string;
         compteCible: string;
@@ -25,7 +24,7 @@ export class Transfert {
             frais:number,
             datecre:Date,
             dateEnvoie:Date,
-            typeTransfert:TransfertType,
+      
             typeFrais:TypeFrais,
             compteSource: string,
             compteCible: string) {
@@ -36,7 +35,6 @@ export class Transfert {
             this.typeFrais = frais;
             this.datecre = datecre;
             this.dateEnvoie = dateEnvoie;
-            this.typeTransfert = typeTransfert;
             this.typeFrais=typeFrais;
             this.compteSource = compteSource;
             this.compteCible = compteCible;

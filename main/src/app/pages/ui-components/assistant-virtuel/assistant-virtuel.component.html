@@ -6,11 +6,15 @@
   *ngIf="notificationVisible && !isOpen"
 >
   <ng-container *ngIf="userRole === 'ROLE_ChargéClientele'; else transfertNotif">
+      <div (click)="showEcheancesPopup = true" style="cursor: pointer;">
     ⚠️ {{ echeancesEnAlerte.length }} échéance(s) de remboursement proche(s) à traiter !
+  </div>
   </ng-container>
 
   <ng-template #transfertNotif>
+    <div (click)="openTransfertsPopup()" style="cursor: pointer;">
     Vous avez {{ transfertsEnAttenteCount }} transfert(s) en attente 👋
+  </div>
   </ng-template>
 
   <span class="mini-notification" (click)="notificationVisible = false">X</span>
@@ -96,4 +100,89 @@
 </div>
 
 
-  
+<!-- Pop-up de transferts en attente -->
+
+<div class="popup-overlay" *ngIf="showTransfertsPopup">
+  <div class="popup-content-elegant">
+    <h3>📦 Transferts en attente</h3>
+
+    <table class="modern-table" *ngIf="transfertsEnAttente.length > 0; else noTransfert">
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>État transfert</th>
+          <th>date création</th>
+          <th>montant transfert</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of transfertsEnAttente">
+          <td>{{ t.refTransfert }}</td>
+          <td>
+            <span [ngClass]="{
+              'etat-pending': t.etatTransfert === 'TRAITEMENT'
+            }">
+              {{ t.etatTransfert }}
+            </span>
+          </td>
+            <td>{{ t.datecre }}</td>
+              <td>{{ t.montantTransfert }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noTransfert>
+      <p class="no-transfert-msg">Aucun transfert en attente pour le moment 🎉</p>
+    </ng-template>
+
+    <button class="elegant-button" (click)="showTransfertsPopup = false">Fermer</button>
+  </div>
+</div>
+
+
+
+
+
+<!-- Pop-up de echeance de remboursement -->
+
+<div class="popup-overlay" *ngIf="showEcheancesPopup">
+  <div class="popup-content-elegant">
+    <h3>📅 Échéances à venir</h3>
+
+    <table class="modern-table" *ngIf="echeancesEnAlerte.length > 0; else noEcheance">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Principal (€)</th>
+          <th>Intérêt (€)</th>
+          <th>Autres Charges (€)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ech of echeancesEnAlerte">
+          <td>{{ ech.dateEch | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ ech.principalEch }}</td>
+          <td>{{ ech.interet }}</td>
+          <td>{{ ech.autreCharge }}</td>
+          <td>
+            <span [ngClass]="{
+              'status-valid': ech.flgValid,
+              'status-pending': !ech.flgValid && !ech.flgTrait,
+              'status-traited': ech.flgTrait && !ech.flgValid
+            }">
+              {{ ech.flgValid ? 'Validée' : (ech.flgTrait ? 'Traitée' : 'À traiter') }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noEcheance>
+      <p class="no-transfert-msg">Aucune échéance à venir. Tout est à jour 👍</p>
+    </ng-template>
+
+    <button class="elegant-button" (click)="showEcheancesPopup = false">Fermer</button>
+  </div>
+</div>
