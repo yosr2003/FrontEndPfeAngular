@@ -48,9 +48,9 @@ export class AppAssistantVirtuelSideBar {
         // Appel ta nouvelle version de createNewConversation()
         return this.createNewConversation().pipe(
           switchMap(created =>
-            this.ConversationService.getMessagesByConversation(created.id_conversation).pipe(
-              tap(messages => {
-                created.messages = messages;
+            this.ConversationService.getConversationById(created.id_conversation).pipe(
+              tap(conversation => {
+                created.messages =conversation.messages;
                 this.conversationcourante = created;
               })
             )
@@ -59,8 +59,8 @@ export class AppAssistantVirtuelSideBar {
       } else {
         this.conversations = data;
         this.conversationcourante = data[0];
-        return this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation).pipe(
-          tap(messages => {this.conversationcourante.messages = messages;messages.forEach(msg => this.checkAndLoadPdf(msg))})
+        return this.ConversationService.getConversationById(this.conversationcourante.id_conversation).pipe(
+          tap(Conversation => {this.conversationcourante.messages =Conversation.messages;Conversation.messages.forEach(msg => this.checkAndLoadPdf(msg))})
         );
       }
     })
@@ -110,7 +110,7 @@ export class AppAssistantVirtuelSideBar {
       this.scrollToBottom();
       response.conversation=this.conversationcourante;
       response.timestamp=new Date();
-      this.ConversationService.addMessage(response).subscribe({
+      this.ConversationService.addMessage(response,this.conversationcourante.id_conversation).subscribe({
         next: (resultat) => console.log('Message enregistré avec succès',resultat),
         error: (err) => console.error('Erreur enregistrement message :', err)
       });
@@ -140,9 +140,9 @@ export class AppAssistantVirtuelSideBar {
   selectConversation(conversation: Conversation) {
     this.conversationcourante = conversation;
     this.showHistory = false;
-    this.ConversationService.getMessagesByConversation(conversation.id_conversation).subscribe(data => {
+    this.ConversationService.getConversationById(conversation.id_conversation).subscribe(data => {
       console.log(data);
-      this.conversationcourante.messages= data;
+      this.conversationcourante.messages= data.messages;
       console.log("les messages",this.conversationcourante.messages)
       });
   }
@@ -196,51 +196,13 @@ export class AppAssistantVirtuelSideBar {
         conversation: this.conversationcourante
       });
        
-      this.ConversationService.addMessage(successMessage).subscribe();
+      this.ConversationService.addMessage(successMessage,this.conversationcourante.id_conversation).subscribe();
       this.conversationcourante.messages.push(successMessage);
       this.scrollToBottom();
       console.error("Erreur d'analyse du justificatif :", err);
       }
       });
-    // const analyseMessage = new Message({
-    //   texteReponse: "📄 Justificatif analysé : tout semble correct (test).",
-    //   intention: "analyse_justificatif",
-    //   entites: {
-    //     ...messageReponse.entites,
-    //     urlProlongation: messageReponse.texteReponse,
-    //     dateProlongation: dateProlongation
-    //   },
-    //   conversation: this.conversationcourante
-    // });
-
-    // this.conversationcourante.messages.push(analyseMessage);
-    // this.scrollToBottom();
     
-    // fallback vide si manquant
-  //   const apiUrl = messageReponse.texteReponse; 
-  //   const formData = new FormData();
-  //   formData.append("dateProlongation", dateProlongation); // date bidon
-  //   formData.append("fichier", selectedFile);
-  //   const message = new Message({
-  //     texteReponse: "✅ prolongation effectuée avce succées.",
-  //     intention: "prolonger_expiration_dossier",
-  //     conversation: this.conversationcourante
-  //   });
-  //   this.http.put(apiUrl, formData, {
-  //     headers: {
-  //       Authorization: `Bearer ${this.tokenStorage.getToken()}`
-  //     }
-  //   }).subscribe({
-  //     next: () =>  {
-  //       this.ConversationService.addMessage(message).subscribe({
-  //         next: () => console.log("Réponse enregistrée avec succès."),
-  //         error: (err) => console.error("Erreur d'enregistrement :", err)
-  //       });
-  //       this.conversationcourante.messages.push(message);
-  //       this.scrollToBottom();},
-  //     //alert("✅ Prolongation envoyée !"),
-  //     error: err => alert("❌ Erreur : " + err.error)
-  //   });
    }
 }
 
@@ -310,7 +272,7 @@ export class AppAssistantVirtuelSideBar {
     }
     }).subscribe({
     next: () => {
-      this.ConversationService.addMessage(successMessage).subscribe();
+      this.ConversationService.addMessage(successMessage,this.conversationcourante.id_conversation).subscribe();
       this.conversationcourante.messages.push(successMessage);
       this.scrollToBottom();
     },

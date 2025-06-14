@@ -31,6 +31,13 @@ export class ConversationService {private baseUrl = 'http://localhost:8085';
     });
     return this.http.get<Message[]>(`${this.baseUrl}/messages/${id}`,{ headers }).pipe(catchError(this.handleError));
   }
+  getConversationById(id:Number):Observable<Conversation>{
+    const token = this.tokenStorage.getToken(); 
+    const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<Conversation>(`${this.baseUrl}/conversations/${id}`,{ headers }).pipe(catchError(this.handleError));
+  }
 
   addConversation(conversation: Conversation): Observable<Conversation> {
     const token = this.tokenStorage.getToken(); 
@@ -41,10 +48,9 @@ export class ConversationService {private baseUrl = 'http://localhost:8085';
     .pipe(catchError(this.handleError));
   }
 
-  addMessage(message: Message): Observable<Message> {
+  addMessage(message: Message,id:Number): Observable<Message> {
     const messageAEnvoyer = {
     texteMessage: message.texteMessage,
-    //texteReponse: "essaie test ",
     texteReponse:message.texteReponse,
     intention: message.intention|| null,
     entites: message.entites,
@@ -56,7 +62,7 @@ export class ConversationService {private baseUrl = 'http://localhost:8085';
     const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
     });
-    return this.http.post<Message>(`${this.baseUrl}/messages`, messageAEnvoyer,{ headers })
+    return this.http.post<Message>(`${this.baseUrl}/messages/${id}`, messageAEnvoyer,{ headers })
     .pipe(catchError(this.handleError));
   }
 

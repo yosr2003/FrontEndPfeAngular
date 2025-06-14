@@ -98,9 +98,9 @@ const role = this.tokenStorage.getRole();
         // Appel ta nouvelle version de createNewConversation()
         return this.createNewConversation().pipe(
           switchMap(created =>
-            this.ConversationService.getMessagesByConversation(created.id_conversation).pipe(
-              tap(messages => {
-                created.messages = messages;
+            this.ConversationService.getConversationById(created.id_conversation).pipe(
+              tap(conversation => {
+                created.messages = conversation.messages;
                 this.conversationcourante = created;
               })
             )
@@ -109,8 +109,8 @@ const role = this.tokenStorage.getRole();
       } else {
         this.conversations = data;
         this.conversationcourante = data[0];
-        return this.ConversationService.getMessagesByConversation(this.conversationcourante.id_conversation).pipe(
-          tap(messages => {this.conversationcourante.messages = messages;messages.forEach(msg => this.checkAndLoadPdf(msg))})
+        return this.ConversationService.getConversationById(this.conversationcourante.id_conversation).pipe(
+          tap(Conversation => {this.conversationcourante.messages =Conversation.messages ;Conversation.messages.forEach(msg => this.checkAndLoadPdf(msg))})
         );
       }
     })
@@ -198,9 +198,9 @@ openTransfertsPopup() {
   selectConversation(conversation: Conversation) {
     this.conversationcourante = conversation;
     this.showHistory = false;
-    this.ConversationService.getMessagesByConversation(conversation.id_conversation).subscribe(data => {
+    this.ConversationService.getConversationById(conversation.id_conversation).subscribe(data => {
       console.log(data);
-      this.conversationcourante.messages= data;
+      this.conversationcourante.messages= data.messages;
       console.log("les messages",this.conversationcourante.messages)
       });
   }
@@ -230,7 +230,7 @@ openTransfertsPopup() {
       this.scrollToBottom();
       response.conversation=this.conversationcourante;
       response.timestamp=new Date();
-      this.ConversationService.addMessage(response).subscribe({
+      this.ConversationService.addMessage(response,this.conversationcourante.id_conversation).subscribe({
         next: (resultat) => console.log('Message enregistré avec succès',resultat),
         error: (err) => console.error('Erreur enregistrement message :', err)
       });
@@ -267,7 +267,7 @@ isProlongationLink(text: string): boolean {
       }
     }).subscribe({
       next: () =>  {
-        this.ConversationService.addMessage(message).subscribe({
+        this.ConversationService.addMessage(message,this.conversationcourante.id_conversation).subscribe({
           next: () => console.log("Réponse enregistrée avec succès."),
           error: (err) => console.error("Erreur d'enregistrement :", err)
         });
