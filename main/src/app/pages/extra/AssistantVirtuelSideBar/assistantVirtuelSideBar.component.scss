@@ -1,16 +1,6 @@
 
 
 
-// .chat-container {
-//   display: flex;
-//   flex-direction: column;
-//   flex: 1;
-//   height: 100vh;
-//   background-color: #f1f5ff;
-//   font-family: 'Inter', sans-serif;
-//   overflow: hidden; /* Pour éviter les débordements */
-// }
-
 
 .chat-header {
   background-color: #e7edff;
@@ -30,26 +20,6 @@
   margin-top: 4px;
 }
 
-// .chat-box {
-//   display: flex;
-//   flex-direction: column;
-//   flex: 1;
-//   height: 100%;
-//   max-height: 100%;
-//   background-color: white;
-//   border-radius: 16px 16px 0 0;
-//   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-//   overflow: hidden;
-//   margin: 0;
-// }
-
-// .chat-sidebar {
-//   display: flex;
-//   align-items: center;
-//   padding: 16px;
-//   background-color: #f8f9ff;
-//   border-bottom: 1px solid #e0e0e0;
-// }
 
 .chat-sidebar .avatar {
   width: 40px;
@@ -64,9 +34,7 @@
   color: #333;
 }
 
-// .messages{
-//   min-height: 0;
-// }
+
 .chat-content {
   flex: 1;
   min-height: 0;
@@ -85,13 +53,6 @@
   flex-direction: column;
 }
 
-// .message.bot {
-//   align-items: flex-start;
-// }
-
-// .message.user {
-//   align-items: flex-end;
-// }
 
 
 .avatar-small {
@@ -101,21 +62,7 @@
   margin-bottom: 6px;
 }
 
-// .bubble {
-//   max-width: 75%; // au lieu de 320px, plus fluide
-//   word-wrap: break-word;
-//   background-color: #e7edff;
-//   color: #2a2a2a;
-//   padding: 14px 18px;
-//   border-radius: 18px;
-//   //max-width: 320px;
-//   font-size: 15px;
-//   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-// }
 
-// .message.user .bubble {
-//   background-color: #d9f0ff;
-// }
 
 .date {
   font-size: 12px;
@@ -123,13 +70,6 @@
   margin-top: 6px;
 }
 
-// .chat-input {
-//   display: flex;
-//   align-items: center;
-//   padding: 16px 24px;
-//   border-top: 1px solid #e0e0e0;
-//   background-color: white;
-// }
 
 .chat-input input {
   flex: 1;
@@ -189,7 +129,6 @@
   }
 }
 
-/////
 .chat-container {
   display: flex;
   flex-direction: column;
@@ -314,16 +253,3 @@
   background-color: #303f9f;
   transform: scale(1.02);
 }
-
-
-// .message.bot.pdf-message .bubble {
-//   max-width: 100%;
-//   width: 100%;
-//   padding: 0;
-//   background-color: transparent;
-//   box-shadow: none;
-// }
-
-
-/* Rest of your existing styles (typing indicator, etc.) can remain the same */
-
