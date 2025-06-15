@@ -24,6 +24,7 @@
         [class.selected]="conv.id_conversation === conversationcourante?.id_conversation"
         (click)="selectConversation(conv)">
       📅 {{ conv.dateCreation | date:'short' }}
+       <button class="delete-btn" (click)="deleteConversation(conv, $event)">🗑️</button>
     </div>
   </div>
 </div>

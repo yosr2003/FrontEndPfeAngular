@@ -343,3 +343,15 @@
 .add-conversation-btn:hover {
   background-color: #0056b3;
 }
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 1.2rem;
+
+  &:hover {
+    color: darkred;
+  }
+}

@@ -2,7 +2,7 @@ import { Employe } from "./employe";
 import { Message } from "./message";
 
 export class Conversation {
-    id_conversation: Number;
+    id_conversation: number;
     employe: Employe;
     dateCreation:Date;
     messages: Message[];

@@ -317,6 +317,29 @@ toggleConversationsList() {
   this.showConversationsList = !this.showConversationsList;
 }
 
+deleteConversation(convToDelete: Conversation, event: MouseEvent) {
+  event.stopPropagation(); // Empêche le clic de sélectionner la conversation
+
+  const confirmDelete = confirm("❗ Voulez-vous vraiment supprimer cette conversation ?");
+  if (!confirmDelete) return;
+
+  this.ConversationService.deleteConversationById(convToDelete.id_conversation).subscribe({
+    next: () => {
+      this.conversations = this.conversations.filter(conv => conv.id_conversation !== convToDelete.id_conversation);
+
+      // Si on supprime la conversation courante, on la remplace par la suivante ou précédente
+      if (this.conversationcourante.id_conversation === convToDelete.id_conversation) {
+        this.conversationcourante = this.conversations[0] || null;
+      }
+
+      console.log("Conversation supprimée avec succès");
+    },
+    error: err => {
+      console.error("Erreur lors de la suppression :", err);
+      alert("Une erreur est survenue lors de la suppression.");
+    }
+  });
+}
 
  
 

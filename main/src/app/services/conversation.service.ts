@@ -79,4 +79,13 @@ export class ConversationService {private baseUrl = 'http://localhost:8085';
       console.error(errorMessage);
       return throwError(errorMessage);
     }
+
+deleteConversationById(id: number): Observable<void> {
+  const token = this.tokenStorage.getToken();
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+  return this.http.delete<void>(`${this.baseUrl}/conversations/${id}`, { headers });
+}
+
 }
