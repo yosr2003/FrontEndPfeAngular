@@ -3,11 +3,37 @@
     <div class="chat-sidebar">
       <img src="assets/robot.png" class="avatar" alt="Avatar" />
       <span class="contact-name">Assistant GTI</span>
+       <button class="settings-button" (click)="toggleConversationsList()">
+    ⚙️
+  </button>
     </div>
+    <!-- Panneau flottant de conversations -->
+<div class="floating-conversations-panel" *ngIf="showConversationsList">
+  <div class="panel-header">
+    <span class="panel-title">💬 liste des Conversations</span>
+    <button class="close-button" (click)="toggleConversationsList()">❌</button>
+  </div>
+
+  <div class="conversations-history" *ngIf="conversations.length > 1">
+    <div class="conversation-item"
+        *ngFor="let conv of conversations"
+        [class.selected]="conv.id_conversation === conversationcourante?.id_conversation"
+        (click)="selectConversation(conv)">
+      📅 {{ conv.dateCreation | date:'short' }}
+    </div>
+  </div>
+</div>
+
+
 
     <div class="chat-content-wrapper">
       <div class="messages-container">
         <div class="messages">
+
+     
+
+
+
           <div *ngFor="let message of conversationcourante.messages" >
             <div class="message user" *ngIf="message.texteMessage">
               <div class="bubble">{{ message.texteMessage }}</div>
@@ -54,3 +80,5 @@
     </div>
   </div>
 </div>
+
+

@@ -280,7 +280,13 @@ export class AppAssistantVirtuelSideBar {
   });
 }
 
- 
+
+
+showConversationsList = false;
+
+toggleConversationsList() {
+  this.showConversationsList = !this.showConversationsList;
+}
 
 
  

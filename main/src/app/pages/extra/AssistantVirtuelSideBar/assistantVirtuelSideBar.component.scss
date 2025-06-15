@@ -253,3 +253,72 @@
   background-color: #303f9f;
   transform: scale(1.02);
 }
+
+
+.floating-conversations-panel {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  width: 270px;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 12px;
+  z-index: 1000;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #e74c3c;
+}
+
+.conversation-item {
+  cursor: pointer;
+  padding: 8px 10px;
+  margin: 6px 0;
+  border-radius: 8px;
+  background-color: #f7f7f7;
+  transition: background-color 0.2s ease;
+}
+
+.conversation-item:hover {
+  background-color: #e4f1fe;
+}
+
+.conversation-item.selected {
+  background-color: #d0f0ff;
+  font-weight: bold;
+}
+.settings-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+}
