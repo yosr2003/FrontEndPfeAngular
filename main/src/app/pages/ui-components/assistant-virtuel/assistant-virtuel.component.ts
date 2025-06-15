@@ -210,7 +210,7 @@ openTransfertsPopup() {
 
   const texteMessage = this.newMessage;
   const message = new Message({
-  texteReponse: texteMessage,
+  texteMessage: texteMessage,
   conversation: this.conversationcourante
   });
   //const message= new Message(new Date(),texteMessage,this.conversationcourante);
