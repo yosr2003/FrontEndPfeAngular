@@ -10,7 +10,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ChatService } from 'src/app/services/chat.service';
 import { Conversation } from 'src/app/classes/conversation';
 import { ConversationService } from 'src/app/services/conversation.service';
-import { Observable, switchMap, tap } from 'rxjs';
+import { map, Observable, switchMap, tap, throwError } from 'rxjs';
 import { Message } from 'src/app/classes/message';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Employe } from 'src/app/classes/employe';
@@ -36,43 +36,44 @@ export class AppAssistantVirtuelSideBar {
   constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService,private cdr: ChangeDetectorRef) {
   this.conversationcourante = this.conversations[0];}
 
-  ngOnInit() {
-    this.assistantStateService.openSidebar(); 
-    const user = this.tokenStorage.getUser();
-    const userId = user?.id;
-    console.log("ID de l'utilisateur connecté :", userId);
+ ngOnInit() {
+  this.assistantStateService.openSidebar(); 
+  const user = this.tokenStorage.getUser();
+  const userId = user?.id;
 
-    this.ConversationService.getConversationsByEmploye(userId).pipe(
+  if (!userId) {
+    console.error("Utilisateur non authentifié");
+    return;
+  }
+
+  this.ConversationService.getConversationsByEmploye(userId).pipe(
     switchMap(data => {
       if (data.length === 0) {
-        // Appel ta nouvelle version de createNewConversation()
-        return this.createNewConversation().pipe(
-          switchMap(created =>
-            this.ConversationService.getConversationById(created.id_conversation).pipe(
-              tap(conversation => {
-                created.messages =conversation.messages;
-                this.conversationcourante = created;
-              })
-            )
-          )
-        );
+        // Si aucune conversation, créer une nouvelle
+        return this.createNewConversation();
       } else {
+        // Sinon, charger la première existante
         this.conversations = data;
         this.conversationcourante = data[0];
+
         return this.ConversationService.getConversationById(this.conversationcourante.id_conversation).pipe(
-          tap(Conversation => {this.conversationcourante.messages =Conversation.messages;Conversation.messages.forEach(msg => this.checkAndLoadPdf(msg))})
+          tap(conversation => {
+            this.conversationcourante.messages = conversation.messages;
+            conversation.messages.forEach(msg => this.checkAndLoadPdf(msg));
+          }),
+          map(() => this.conversationcourante)
         );
       }
     })
   ).subscribe({
-    next: () => {
-      console.log("Conversation courante :", this.conversationcourante);
+    next: (conv) => {
+      console.log("Conversation courante :", conv);
     },
     error: err => {
       console.error("Erreur :", err);
     }
   });
-  }
+}
 
   ngOnDestroy() {
     this.assistantStateService.closeSidebar();
@@ -121,22 +122,50 @@ export class AppAssistantVirtuelSideBar {
     }
   });
   }
-  createNewConversation(): Observable<Conversation>{
-    const user = this.tokenStorage.getUser();
-    const userId = user?.id;
-    console.log("ID de l'utilisateur connecté :", userId);
-      const newConversation = new Conversation(
-      user,
-      new Date() 
-      );
-      return this.ConversationService.addConversation(newConversation).pipe(
-      tap(createdConversation => {
-        console.log("Conversation créée :", createdConversation);
-        this.conversations.unshift(createdConversation);
-        this.selectConversation(createdConversation); 
-      })
-    );
+
+
+createNewConversation(): Observable<Conversation> {
+  const user = this.tokenStorage.getUser();
+  const userId = user?.id;
+
+  if (!userId) {
+    console.error("Utilisateur non authentifié");
+    return throwError(() => new Error("Utilisateur non authentifié"));
+  }
+
+  const nouvelleConversation = new Conversation(user, new Date());
+
+  return this.ConversationService.addConversation(nouvelleConversation).pipe(
+    switchMap((createdConversation: Conversation) =>
+      this.ConversationService.getConversationById(createdConversation.id_conversation).pipe(
+        map(loadedConv => {
+          createdConversation.messages = loadedConv.messages || [];
+          return createdConversation;
+        }),
+        tap(conv => {
+          this.conversations.unshift(conv);
+          this.conversationcourante = conv;
+          this.showConversationsList = false;
+          console.log("Nouvelle conversation courante :", conv);
+        })
+      )
+    )
+  );
+}
+
+addNewConversationFromUI() {
+  this.createNewConversation().subscribe({
+    next: (conv) => {
+      console.log("Conversation créée via UI :", conv);
+    },
+    error: (err) => {
+      console.error("Erreur lors de la création de la conversation :", err);
     }
+  });
+}
+
+
+
   selectConversation(conversation: Conversation) {
     this.conversationcourante = conversation;
     this.showHistory = false;

@@ -13,7 +13,11 @@
     <span class="panel-title">💬 liste des Conversations</span>
     <button class="close-button" (click)="toggleConversationsList()">❌</button>
   </div>
-
+ <div class="add-conversation-btn-wrapper">
+<button class="add-conversation-btn" (click)="addNewConversationFromUI()">
+      ➕ Nouvelle conversation
+    </button>
+  </div>
   <div class="conversations-history" *ngIf="conversations.length > 1">
     <div class="conversation-item"
         *ngFor="let conv of conversations"
@@ -29,9 +33,6 @@
     <div class="chat-content-wrapper">
       <div class="messages-container">
         <div class="messages">
-
-     
-
 
 
           <div *ngFor="let message of conversationcourante.messages" >
