@@ -29,12 +29,12 @@ export interface monthlyChart {
 }
 
 @Component({
-  selector: 'app-monthly-earnings',
+  selector: 'app-transactionsParMois',
   standalone: true,
   imports: [NgApexchartsModule, MaterialModule, TablerIconsModule],
-  templateUrl: './monthly-earnings.component.html',
+  templateUrl: 'transactionsParMois.component.html',
 })
-export class AppMonthlyEarningsComponent implements OnInit {
+export class ApptransactionsParMoisComponent implements OnInit {
   @ViewChild('chart') chart: ChartComponent = Object.create(null);
   public monthlyChart!: Partial<monthlyChart> | any;
 
