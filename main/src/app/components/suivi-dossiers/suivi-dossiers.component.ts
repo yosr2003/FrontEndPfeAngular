@@ -32,13 +32,13 @@ export interface yearlyChart {
 }
 
 @Component({
-  selector: 'app-yearly-breakup',
-  templateUrl: './yearly-breakup.component.html',
+  selector: 'app-suivi-dossiers',
+  templateUrl: './suivi-dossiers.component.html',
   standalone: true,
   imports: [MaterialModule, NgApexchartsModule, TablerIconsModule],
   encapsulation: ViewEncapsulation.None,
 })
-export class AppYearlyBreakupComponent implements OnInit {
+export class AppSuiviDossiersComponent implements OnInit {
   @ViewChild('chart') chart!: ChartComponent;
 
   public statusChart: yearlyChart | null = null;

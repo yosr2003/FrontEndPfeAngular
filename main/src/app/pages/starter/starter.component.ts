@@ -1,10 +1,11 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { MaterialModule } from '../../material.module';
-import { AppSalesOverviewComponent } from 'src/app/components/sales-overview/sales-overview.component';
-import { AppYearlyBreakupComponent } from 'src/app/components/yearly-breakup/yearly-breakup.component';
+import { AppVueEnsembleComponent } from 'src/app/components/vue-ensemble/vue-ensemble.component';
 
-import { AppProductPerformanceComponent } from 'src/app/components/product-performance/product-performance.component';
+
+
 import { ApptransactionsParMoisComponent } from 'src/app/components/transactionsParMois/transactionsParMois.component';
+import { AppSuiviDossiersComponent } from 'src/app/components/suivi-dossiers/suivi-dossiers.component';
 
 
 
@@ -13,11 +14,11 @@ import { ApptransactionsParMoisComponent } from 'src/app/components/transactions
   selector: 'app-starter',
   imports: [
     MaterialModule,
-    AppSalesOverviewComponent,
-    AppYearlyBreakupComponent,
+    AppVueEnsembleComponent,
+  AppSuiviDossiersComponent,
     ApptransactionsParMoisComponent,
 
-    AppProductPerformanceComponent,
+
 
   ],
   templateUrl: './starter.component.html',

@@ -48,9 +48,9 @@ export interface SalesOverviewChart {
 }
 
 @Component({
-  selector: 'app-sales-overview',
+  selector: 'app-vue-ensemble',
   standalone: true,
-  templateUrl: './sales-overview.component.html',
+  templateUrl: './vue-ensemble.component.html',
   imports: [
     NgApexchartsModule,
     CommonModule,
@@ -61,7 +61,7 @@ export interface SalesOverviewChart {
     MatOptionModule,
   ],
 })
-export class AppSalesOverviewComponent implements OnInit {
+export class AppVueEnsembleComponent implements OnInit {
   @ViewChild('chart') chart!: ChartComponent;
 
   public salesOverviewChart: SalesOverviewChart = {
