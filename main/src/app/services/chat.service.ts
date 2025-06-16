@@ -18,7 +18,7 @@ export class ChatService {
     entites: m.entites|| null,
     }));
     console.log("les messages a envoyees",messagesToSend);
-    const token = this.tokenStorage.getToken(); // Assure-toi d'importer tokenStorageService
+    const token = this.tokenStorage.getToken(); 
 
     const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`

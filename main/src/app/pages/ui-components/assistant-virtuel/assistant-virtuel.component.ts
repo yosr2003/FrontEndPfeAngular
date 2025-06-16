@@ -257,7 +257,7 @@ isProlongationLink(text: string): boolean {
     formData.append("dateProlongation", dateProlongation); // date bidon
     formData.append("fichier", selectedFile);
     const message = new Message({
-      texteReponse: "✅ prolongation effectuée avce succées.",
+      texteReponse: " prolongation effectuée avce succées.",
       intention: "prolonger_expiration_dossier",
       conversation: this.conversationcourante
     });
@@ -273,7 +273,7 @@ isProlongationLink(text: string): boolean {
         });
         this.conversationcourante.messages.push(message);
         this.scrollToBottom();},
-      //alert("✅ Prolongation envoyée !"),
+      //alert(" Prolongation envoyée !"),
       error: err => alert("❌ Erreur : " + err.error)
     });
   }

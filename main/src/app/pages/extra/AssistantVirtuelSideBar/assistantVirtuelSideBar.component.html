@@ -3,15 +3,21 @@
     <div class="chat-sidebar">
       <img src="assets/robot.png" class="avatar" alt="Avatar" />
       <span class="contact-name">Assistant GTI</span>
-       <button class="settings-button" (click)="toggleConversationsList()">
-    ⚙️
-  </button>
+      <button class="settings-button" (click)="toggleConversationsList()">
+  <i class="bi bi-gear"></i>
+</button>
     </div>
     <!-- Panneau flottant de conversations -->
 <div class="floating-conversations-panel" *ngIf="showConversationsList">
   <div class="panel-header">
-    <span class="panel-title">💬 liste des Conversations</span>
-    <button class="close-button" (click)="toggleConversationsList()">❌</button>
+   <span class="panel-title fs-5 fw-semibold text-primary">
+  <i class="bi bi-chat-dots me-2"></i> Liste des Conversations
+
+</span>
+   <button class="close-button" (click)="toggleConversationsList()">
+  <i class="bi bi-x-lg"></i>
+</button>
+
   </div>
  <div class="add-conversation-btn-wrapper">
 <button class="add-conversation-btn" (click)="addNewConversationFromUI()">

@@ -191,7 +191,7 @@ addNewConversationFromUI() {
     const formData = new FormData();
     formData.append("file", this.selectedFile);
     this.botTyping = true;
-    this.http.post<any>("http://127.0.0.1:8010/analyze-pdf/", formData).subscribe({
+    this.http.post<any>("http://127.0.0.1:8000/analyze-pdf/", formData).subscribe({
       next: (response: any) => {
         this.botTyping = false;
         console.log("Réponse de l'analyse :", response);
@@ -247,6 +247,7 @@ addNewConversationFromUI() {
       text.includes('/dossiersDelegues/DOS') ||
       text.includes('/etatDeclaration/consulter') ||
       text.includes('/RapportMvmntsFinanciers/') ||
+      text.includes('/Swift/T') || 
       text.endsWith('.pdf')
     )
   );
@@ -291,7 +292,7 @@ addNewConversationFromUI() {
     formData.append("fichier", fichier);
     
     const successMessage = new Message({
-    texteReponse: "✅ Prolongation effectuée avec succès.",
+    texteReponse: " Prolongation effectuée avec succès.",
     intention: "prolonger_expiration_dossier",
     conversation: this.conversationcourante
     });
