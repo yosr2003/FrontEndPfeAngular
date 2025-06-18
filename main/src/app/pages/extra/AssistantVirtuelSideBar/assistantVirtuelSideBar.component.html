@@ -64,8 +64,14 @@
                   <div [innerText]="message.texteReponse"></div>
                   
                   <div *ngIf="message.intention === 'analyse_justificatif'">
-                    <button class="prolongation-btn"  (click)="prolongerDepuisAnalyse(message)"><span style="margin-right: 8px;">✅</span> Procéder à la prolongation</button>
+                     <div *ngIf="validitemotif === true; else reuploadMsg">
+                      <button class="prolongation-btn"  (click)="prolongerDepuisAnalyse(message)"><span style="margin-right: 8px;">✅</span> Procéder à la prolongation</button>
+                    </div>
+                    <ng-template #reuploadMsg>
+                      <div style="color: red; margin-top: 8px;">❌ Le motif du justificatif est invalide. Veuillez réessayer avec un autre fichier.</div>
+                    </ng-template>
                   </div>
+
                   
                 </ng-template>
               </div>

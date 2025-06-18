@@ -32,6 +32,7 @@ export class AppAssistantVirtuelSideBar {
   conversationcourante:Conversation;
   currentProlongationApiUrl: string | null = null;
   selectedFile: File | null = null;
+  validitemotif: boolean=false;
   
   constructor(private assistantStateService: AssistantStateService, private http: HttpClient,private chatService: ChatService,private ConversationService:ConversationService,private sanitizer: DomSanitizer,private tokenStorage: TokenStorageService,private cdr: ChangeDetectorRef) {
   this.conversationcourante = this.conversations[0];}
@@ -209,6 +210,7 @@ addNewConversationFromUI() {
           },
           conversation: this.conversationcourante
         });
+        this.validitemotif=response.classification.label === "fort";
         this.idAnalyse=analyseMessage.id_message;
         console.log("msg", analyseMessage);
         
